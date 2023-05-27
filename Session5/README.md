@@ -1,6 +1,8 @@
 # Session-5
 
-[toc]
+<a target="_blank" href="https://colab.research.google.com/github/Shilpaj1994/ERA/blob/master/Session-5/S5.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
 
 
 
