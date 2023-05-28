@@ -3,26 +3,31 @@
 - [1. Setup](#1-setup)
   * [1.1 Colab](#11-colab)
   * [1.1.2 Local System](#112-local-system)
+
 - [2. Code Details](#2-code-details)
-  * [2.1 `model.py`](#21--modelpy-)
-  * [2.2 `utils.py`](#22--utilspy-)
-    + [2.2.1 `get_summary(model, input_size)`](#221--get-summary-model--input-size--)
-    + [2.2.2 `display_loss_and_accuracies`](#222--display-loss-and-accuracies-)
-    + [2.2.3 `GetCorrectPredCount`](#223--getcorrectpredcount-)
-    + [2.2.4 `train`](#224--train-)
-    + [2.2.5 `test`](#225--test-)
-  * [2.3 `S5.ipynb`](#23--s5ipynb-)
-    + [Code Block 1: Importing Required Modules](#code-block-1--importing-required-modules)
-    + [Code Block 2: Checking GPU Availability](#code-block-2--checking-gpu-availability)
-    + [Code Block 3: Data Transformations](#code-block-3--data-transformations)
-    + [Code Block 4: Loading the Dataset](#code-block-4--loading-the-dataset)
-    + [Code Block 5: Creating Data Loaders](#code-block-5--creating-data-loaders)
-    + [Code Block 6: Visualizing Sample Data](#code-block-6--visualizing-sample-data)
-    + [Code Block 7: Importing the Model](#code-block-7--importing-the-model)
-    + [Code Block 8: Initializing Variables for Accuracy and Loss Graphs](#code-block-8--initializing-variables-for-accuracy-and-loss-graphs)
-    + [Code Block 9: Importing Utility Functions](#code-block-9--importing-utility-functions)
-    + [Code Block 10: Model Training and Evaluation](#code-block-10--model-training-and-evaluation)
-    + [Code Block 11: Displaying Loss and Accuracy](#code-block-11--displaying-loss-and-accuracy)
+
+  - [2.1 `model.py`](#21-`modelpy`)
+
+  * [2.2 `utils.py`](#22-`utilspy`)
+    + [2.2.1 `get_summary`](#221-`get-summary`)
+    + [2.2.2 `display_loss_and_accuracies`](#222-`display-loss-and-accuracies`)
+    + [2.2.3 `GetCorrectPredCount`](#223-`getcorrectpredcount`)
+    + [2.2.4 `train`](#224-`train`)
+    + [2.2.5 `test`](#225-`test`)
+
+  * [2.3 `S5.ipynb`](#23-`s5ipynb`)
+    + [Code Block 1: Importing Required Modules](#code-block-1:-importing-required-modules)
+    + [Code Block 2: Checking GPU Availability](#code-block-2:-checking-gpu-availability)
+    + [Code Block 3: Data Transformations](#code-block-3:-data-transformations)
+    + [Code Block 4: Loading the Dataset](#code-block-4:-loading-the-dataset)
+    + [Code Block 5: Creating Data Loaders](#code-block-5:-creating-data-loaders)
+    + [Code Block 6: Visualizing Sample Data](#code-block-6:-visualizing-sample-data)
+    + [Code Block 7: Importing the Model](#code-block-7:-importing-the-model)
+    + [Code Block 8: Initializing Variables for Accuracy and Loss Graphs](#code-block-8:-initializing-variables-for-accuracy-and-loss-graphs)
+    + [Code Block 9: Importing Utility Functions](#code-block-9:-importing-utility-functions)
+    + [Code Block 10: Model Training and Evaluation](#code-block-10:-model-training-and-evaluation)
+    + [Code Block 11: Displaying Loss and Accuracy](#code-block-11:-displaying-loss-and-accuracy)
+
 - [3. Run](#3-run)
   * [3.1 Run on Colab](#31-run-on-colab)
   * [3.2 Run on Local System](#32-run-on-local-system)
@@ -191,7 +196,7 @@ class Net(nn.Module):
 This script contains utility functions that can be used for training a model. It includes functions for model summary, displaying loss and accuracies, displaying data samples, and training/testing the model.
 
 
-#### 2.2.1 `get_summary(model, input_size)`
+#### 2.2.1 `get_summary`
 
 - This function prints the summary of the model architecture
 - It takes an object of the model architecture and the input data shape as input parameters.
