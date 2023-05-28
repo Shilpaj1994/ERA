@@ -475,7 +475,7 @@ for i in range(12):
   plt.yticks([])
 ```
 
-![Display Samples](/assets/display_image.jpg)
+![Display Samples](./assets/display_image.jpg)
 
 
 
