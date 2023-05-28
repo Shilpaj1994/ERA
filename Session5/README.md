@@ -6,27 +6,27 @@
 
 - [2. Code Details](#2-code-details)
 
-  - [2.1 `model.py`](#21-`modelpy`)
+  - [2.1 model.py](#21-modelpy)
 
-  * [2.2 `utils.py`](#22-`utilspy`)
-    + [2.2.1 `get_summary`](#221-`get-summary`)
-    + [2.2.2 `display_loss_and_accuracies`](#222-`display-loss-and-accuracies`)
-    + [2.2.3 `GetCorrectPredCount`](#223-`getcorrectpredcount`)
-    + [2.2.4 `train`](#224-`train`)
-    + [2.2.5 `test`](#225-`test`)
+  * [2.2 utils.py](#utilspy)
+    + [get_summary](#get-summary)
+    + [display_loss_and_accuracies](#display-loss-and-accuracies)
+    + [GetCorrectPredCount](#getcorrectpredcount)
+    + [train](#train)
+    + [test](#test)
 
-  * [2.3 `S5.ipynb`](#23-`s5ipynb`)
-    + [Code Block 1: Importing Required Modules](#code-block-1:-importing-required-modules)
-    + [Code Block 2: Checking GPU Availability](#code-block-2:-checking-gpu-availability)
-    + [Code Block 3: Data Transformations](#code-block-3:-data-transformations)
-    + [Code Block 4: Loading the Dataset](#code-block-4:-loading-the-dataset)
-    + [Code Block 5: Creating Data Loaders](#code-block-5:-creating-data-loaders)
-    + [Code Block 6: Visualizing Sample Data](#code-block-6:-visualizing-sample-data)
-    + [Code Block 7: Importing the Model](#code-block-7:-importing-the-model)
-    + [Code Block 8: Initializing Variables for Accuracy and Loss Graphs](#code-block-8:-initializing-variables-for-accuracy-and-loss-graphs)
-    + [Code Block 9: Importing Utility Functions](#code-block-9:-importing-utility-functions)
-    + [Code Block 10: Model Training and Evaluation](#code-block-10:-model-training-and-evaluation)
-    + [Code Block 11: Displaying Loss and Accuracy](#code-block-11:-displaying-loss-and-accuracy)
+  * [2.3 S5.ipynb](#23-s5ipynb)
+    + [Code Block 1 - Importing Required Modules](#code-block-1---importing-required-modules)
+    - [Code Block 2 - Checking GPU Availability](#code-block-2---checking-gpu-availability)
+    - [Code Block 3 - Data Transformations](#code-block-3---data-transformations)
+    - [Code Block 4 - Loading the Dataset](#code-block-4---loading-the-dataset)
+    - [Code Block 5 - Creating Data Loaders](#code-block-5---creating-data-loaders)
+    - [Code Block 6 - Visualizing Sample Data](#code-block-6---visualizing-sample-data)
+    - [Code Block 7 - Importing the Model](#code-block-7---importing-the-model)
+    - [Code Block 8 - Initializing Variables for Accuracy and Loss Graphs](#code-block-8---initializing-variables-for-accuracy-and-loss-graphs)
+    - [Code Block 9 - Importing Utility Functions](#code-block-9---importing-utility-functions)
+    - [Code Block 10 - Model Training and Evaluation](#code-block-10---model-training-and-evaluation)
+    - [Code Block 11 - Displaying Loss and Accuracy](#code-block-11---displaying-loss-and-accuracy)
 
 - [3. Run](#3-run)
   * [3.1 Run on Colab](#31-run-on-colab)
@@ -138,7 +138,7 @@ This section contains detail information about on the file contents
 
 
 
-### 2.1 `model.py`
+### 2.1 model.py
 
 - This script contains the definition of a neural network model architecture
 - It includes the implementation of the `Net` class, which defines the structure of the neural network.
@@ -191,12 +191,12 @@ class Net(nn.Module):
 
 
 
-### 2.2 `utils.py`
+### 2.2 utils.py
 
 This script contains utility functions that can be used for training a model. It includes functions for model summary, displaying loss and accuracies, displaying data samples, and training/testing the model.
 
 
-#### 2.2.1 `get_summary`
+#### get summary
 
 - This function prints the summary of the model architecture
 - It takes an object of the model architecture and the input data shape as input parameters.
@@ -217,7 +217,7 @@ def get_summary(model: object, input_size: tuple):
 
 
 
-#### 2.2.2 `display_loss_and_accuracies`
+#### display loss and accuracies
 
 - This function displays the training and test information such as losses and accuracies
 - It takes lists containing training losses, training accuracies, test losses, and test accuracies as input parameters
@@ -252,7 +252,7 @@ def display_loss_and_accuracies(train_losses: list, train_acc: list, test_losses
 
 
 
-#### 2.2.3 `GetCorrectPredCount`
+#### GetCorrectPredCount
 
 - This function returns the total number of correct predictions
 - It takes model predictions and correct labels of a given sample of data as input parameters and returns the number of correct predictions.
@@ -269,9 +269,7 @@ def GetCorrectPredCount(pPrediction, pLabels):
 
 
 
-
-
-#### 2.2.4 `train`
+#### train
 
 - This function is used to train the model on the training dataset
 - It takes the model architecture, device (GPU or CPU), training data loader, optimizer, and loss criterion as input parameters
@@ -319,9 +317,7 @@ def train(model, device, train_loader, optimizer, criterion):
 
 
 
-
-
-#### 2.2.5 `test`
+#### test
 
 - This function is used to test the model's training progress on the test dataset
 - It takes the model architecture, device (GPU or CPU), test data loader, and loss criterion as input parameters
@@ -362,11 +358,11 @@ def test(model, device, test_loader, criterion):
 
 
 
-### 2.3 `S5.ipynb`
+### 2.3 S5.ipynb
 
 This file contains code for training and evaluating a neural network model on the MNIST dataset. The code is divided into several code blocks, each serving a specific purpose. Below is an overview of each code block:
 
-#### Code Block 1: Importing Required Modules
+#### Code Block 1 - Importing Required Modules
 
 - In this code block, the necessary modules for the project are imported. These include `sys`, `torch`, `torch.nn`, `torch.nn.functional`, `torch.optim`, and `torchvision`.
 
@@ -392,7 +388,7 @@ if 'google.colab' in sys.modules:
 
 
 
-#### Code Block 2: Checking GPU Availability
+#### Code Block 2 - Checking GPU Availability
 
 - This code block checks if a GPU is available and sets the device accordingly
 - If a GPU is available, the device is set to "cuda"; otherwise, it is set to "cpu".
@@ -407,7 +403,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 
-#### Code Block 3: Data Transformations
+#### Code Block 3 - Data Transformations
 
 - This code block defines the transformations to be applied to the training and test data
 - The transformations include random cropping, resizing, random rotation, tensor conversion, and normalization.
@@ -431,7 +427,7 @@ test_transforms = transforms.Compose([
 
 
 
-#### Code Block 4: Loading the Dataset
+#### Code Block 4 - Loading the Dataset
 
 - In this code block, the MNIST dataset is downloaded and loaded using the `datasets.MNIST` class from torchvision
 - The dataset is divided into training and test sets, and the defined transformations are applied
@@ -444,7 +440,7 @@ test_data = datasets.MNIST('../data', train=False, download=True, transform=test
 
 
 
-#### Code Block 5: Creating Data Loaders
+#### Code Block 5 - Creating Data Loaders
 
 - Data loaders are created for both the training and test datasets using `torch.utils.data.DataLoader`
 - The loaders handle batching, shuffling, and parallel data loading.
@@ -460,7 +456,7 @@ train_loader = torch.utils.data.DataLoader(train_data, **kwargs)
 
 
 
-#### Code Block 6: Visualizing Sample Data
+#### Code Block 6 - Visualizing Sample Data
 
 This code block visualizes a batch of sample images and their corresponding labels using matplotlib.
 
@@ -484,7 +480,7 @@ for i in range(12):
 
 
 
-#### Code Block 7: Importing the Model
+#### Code Block 7 - Importing the Model
 
 The model architecture is imported from the `model` file.
 
@@ -525,7 +521,7 @@ Estimated Total Size (MB): 2.94
 
 
 
-#### Code Block 8: Initializing Variables for Accuracy and Loss Graphs
+#### Code Block 8 - Initializing Variables for Accuracy and Loss Graphs
 
 Empty lists are initialized to store the training and test losses, as well as the training and test accuracies. Additionally, a dictionary is created to store incorrectly predicted samples during testing.
 
@@ -541,7 +537,7 @@ test_incorrect_pred = {'images': [], 'ground_truths': [], 'predicted_vals': []}
 
 
 
-#### Code Block 9: Importing Utility Functions
+#### Code Block 9 - Importing Utility Functions
 
 Utility functions for training and testing the model are imported from the `utils` file.
 
@@ -551,7 +547,7 @@ from utils import train, test
 
 
 
-#### Code Block 10: Model Training and Evaluation
+#### Code Block 10 - Model Training and Evaluation
 
 - In this code block, the model is trained and evaluated
 - The model is instantiated, an optimization algorithm (SGD) is defined, and a learning rate scheduler is set
@@ -597,7 +593,7 @@ for epoch in range(1, num_epochs+1):
 
 
 
-#### Code Block 11: Displaying Loss and Accuracy
+#### Code Block 11 - Displaying Loss and Accuracy
 
 This code block uses the `display_loss_and_accuracies` function from the `utils` module to plot the training and test loss curves and display the training and test accuracies.
 
