@@ -12,6 +12,10 @@
 
 ## Code-1: The Setup
 
+<a target="_blank" href="https://colab.research.google.com/github/Shilpaj1994/ERA/blob/master/Session7/F1.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
+
 ### Target:
 - Get the set-up right
 - Set Extract, Transform and Load pipeline
@@ -72,6 +76,10 @@ Estimated Total Size (MB): 25.85
 
 ## Code-2: The Skeleton
 
+<a target="_blank" href="https://colab.research.google.com/github/Shilpaj1994/ERA/blob/master/Session7/F2.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
+
 ### Target:
 
 - Get the basic model skeleton right. I have to avoid changing this skeleton as much as possible
@@ -129,6 +137,10 @@ Estimated Total Size (MB): 2.11
 
 
 ## Code-3: The Lighter Model
+
+<a target="_blank" href="https://colab.research.google.com/github/Shilpaj1994/ERA/blob/master/Session7/F3.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
 
 ### Target:
 
@@ -188,6 +200,10 @@ Estimated Total Size (MB): 0.32
 
 
 ## Code-4: The Batch Normalization
+
+<a target="_blank" href="https://colab.research.google.com/github/Shilpaj1994/ERA/blob/master/Session7/F4.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
 
 ### Target:
 
@@ -250,6 +266,10 @@ Estimated Total Size (MB): 0.32
 
 
 ## Code-5: The Global Average Pooling
+
+<a target="_blank" href="https://colab.research.google.com/github/Shilpaj1994/ERA/blob/master/Session7/F5.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
 
 ### Target:
 
@@ -315,6 +335,10 @@ Estimated Total Size (MB): 0.45
 
 ## Code-6: Image Augmentation
 
+<a target="_blank" href="https://colab.research.google.com/github/Shilpaj1994/ERA/blob/master/Session7/F6.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
+
 ### Target:
 
 - Add augmentation techniques to improve the test accuracy
@@ -346,6 +370,10 @@ Estimated Total Size (MB): 0.45
 
 
 ## Code-7: The Learning Rate Scheduler
+
+<a target="_blank" href="https://colab.research.google.com/github/Shilpaj1994/ERA/blob/master/Session7/F7.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
 
 ### Target:
 
@@ -393,7 +421,7 @@ Estimated Total Size (MB): 0.45
 
 ### Analysis:
 
-- Tried using the ReduceLROnPlateau scheduler
+- Tried using the `ReduceLROnPlateau` scheduler
 - Model started converging but overshoot after achieving 99.13% on the test data
 - Model couldn't achieve the desired accuracy but reached close to it
 - Need to revisit the augmentation again before fixing on LR scheduler strategy
