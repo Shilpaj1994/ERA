@@ -325,7 +325,7 @@ Estimated Total Size (MB): 0.45
 - Slight improvement in the accuracy when batch size of 64 was used instead of 128
 - The model is training but failing to achieve the target of 99.4 %
 - It seems like the model has reached its capacity
-- Need to increase the receptive field of the model to get more output and increase the accuracy
+- Need to merge features effectively to get more output and increase the accuracy
 
 
 
