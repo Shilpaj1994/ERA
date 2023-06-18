@@ -144,11 +144,11 @@ Estimated Total Size (MB): 2.11
 
 ### Target:
 
-- Reduce the number of parameters in the model and finalize the architecture which can achieve good results with lesser parameters
+- Reduce the number of parameters in the model
 
 ### Results:
 
-- Parameters: 13.7K
+- Parameters: 14.4K
 - Best Training Accuracy: 97.34
 - Best Test Accuracy: 98.58
 
@@ -208,6 +208,7 @@ Estimated Total Size (MB): 0.32
 ### Target:
 
 - Add Batch Normalization to increase the model efficiency
+- Try reducing batch size to 128
 
 ### Results:
 
@@ -256,7 +257,7 @@ Estimated Total Size (MB): 0.32
 ### Analysis:
 
 - By reducing the batch size to 128, observed quicker convergence
-- To get a scope of reducing parameters, removed the last 2 layers capping the receptive field at 22
+- To get a scope of reducing parameters, removed the last 2 layers capping the receptive field at 28
 - Larger kernel of size 6x6 is used in the last layer
 
 
@@ -274,6 +275,7 @@ Estimated Total Size (MB): 0.32
 ### Target:
 
 - Reduce the number of parameters are try to train the model
+- Try reducing batch size to 64
 
 ### Results:
 
@@ -322,10 +324,8 @@ Estimated Total Size (MB): 0.45
 - After using the Global Average Pooling layer, the number of parameters are reduced to 7,312
 - Slight improvement in the accuracy when batch size of 64 was used instead of 128
 - The model is training but failing to achieve the target of 99.4 %
-- It seems like the model has reached its capacity. Need to try some augmentation to make the model learn
-- To understand what augmentation should be used, misclassified images are printed out
-
-![](Data/misclassified.png)
+- It seems like the model has reached its capacity
+- Need to increase the receptive field of the model to get more output and increase the accuracy
 
 
 
@@ -333,7 +333,7 @@ Estimated Total Size (MB): 0.45
 
 
 
-## Code-6: Image Augmentation
+## Code-6: Use 1x1 layers
 
 <a target="_blank" href="https://colab.research.google.com/github/Shilpaj1994/ERA/blob/master/Session7/F6.ipynb">
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
@@ -341,71 +341,42 @@ Estimated Total Size (MB): 0.45
 
 ### Target:
 
-- Add augmentation techniques to improve the test accuracy
-- Need to add augmentation techniques that will create images similar to the misclassified images in the training dataset
+- Use 1x1 layers for merging the features to increase model performance
+- Add one more convolutional layer in block-2
 
 ### Results:
 
-- Parameters: 7.3K
-- Best Training Accuracy: 91.42
-- Best Test Accuracy: 99.08
-
-![image-20230617062412832](Data/image-20230617062412832.png)
-
-![image-20230617062505725](Data/image-20230617062505725.png)
-
-### Analysis:
-
-- Following augmentation techniques are used:
-  - Cutout
-  - Affine transformation since misclassified images had digits shifted 
-- Model is reaching its capacity even after adding augmentation
-- Need to test with learning rate scheduler for faster convergence
-- The training data failed to mimic the properties of the misclassified images
-
-
-
----
-
-
-
-## Code-7: The Learning Rate Scheduler
-
-<a target="_blank" href="https://colab.research.google.com/github/Shilpaj1994/ERA/blob/master/Session7/F7.ipynb">
-  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
-</a>
-
-### Target:
-
-- Try using LR scheduler for faster convergence
-
-### Results:
-
-- Parameters: 7.3K
-- Best Training Accuracy: 91.06
-- Best Test Accuracy: 99.13
+- Parameters: 6,874
+- Best Training Accuracy: 98.49
+- Best Test Accuracy: 99.38
 
 ```python
 ----------------------------------------------------------------
         Layer (type)               Output Shape         Param #
 ================================================================
-            Conv2d-1           [-1, 12, 26, 26]             108
-       BatchNorm2d-2           [-1, 12, 26, 26]              24
-            Conv2d-3           [-1, 12, 24, 24]           1,296
-       BatchNorm2d-4           [-1, 12, 24, 24]              24
-            Conv2d-5           [-1, 12, 22, 22]           1,296
-       BatchNorm2d-6           [-1, 12, 22, 22]              24
-            Conv2d-7           [-1, 12, 20, 20]           1,296
-       BatchNorm2d-8           [-1, 12, 20, 20]              24
-         MaxPool2d-9           [-1, 12, 10, 10]               0
-           Conv2d-10             [-1, 16, 8, 8]           1,728
-      BatchNorm2d-11             [-1, 16, 8, 8]              32
-           Conv2d-12             [-1, 10, 6, 6]           1,440
-      BatchNorm2d-13             [-1, 10, 6, 6]              20
-        AvgPool2d-14             [-1, 10, 1, 1]               0
+            Conv2d-1           [-1, 10, 26, 26]              90
+       BatchNorm2d-2           [-1, 10, 26, 26]              20
+            Conv2d-3           [-1, 10, 24, 24]             900
+       BatchNorm2d-4           [-1, 10, 24, 24]              20
+            Conv2d-5           [-1, 10, 22, 22]             900
+       BatchNorm2d-6           [-1, 10, 22, 22]              20
+            Conv2d-7           [-1, 10, 20, 20]             900
+       BatchNorm2d-8           [-1, 10, 20, 20]              20
+            Conv2d-9           [-1, 10, 20, 20]             100
+      BatchNorm2d-10           [-1, 10, 20, 20]              20
+        MaxPool2d-11           [-1, 10, 10, 10]               0
+           Conv2d-12             [-1, 12, 8, 8]           1,080
+      BatchNorm2d-13             [-1, 12, 8, 8]              24
+           Conv2d-14             [-1, 12, 6, 6]           1,296
+      BatchNorm2d-15             [-1, 12, 6, 6]              24
+           Conv2d-16             [-1, 12, 4, 4]           1,296
+      BatchNorm2d-17             [-1, 12, 4, 4]              24
+AdaptiveAvgPool2d-18             [-1, 12, 1, 1]               0
+           Conv2d-19             [-1, 10, 1, 1]             120
+      BatchNorm2d-20             [-1, 10, 1, 1]              20
 ================================================================
-Total params: 7,312
-Trainable params: 7,312
+Total params: 6,874
+Trainable params: 6,874
 Non-trainable params: 0
 ----------------------------------------------------------------
 Input size (MB): 0.00
@@ -415,13 +386,141 @@ Estimated Total Size (MB): 0.45
 ----------------------------------------------------------------
 ```
 
-![image-20230617062628138](Data/image-20230617062628138.png)
+![image-20230618163005779](Data/image-20230618163005779.png)
 
-![image-20230617062704726](Data/image-20230617062704726.png)
+![image-20230618163113875](Data/image-20230618163113875.png)
 
 ### Analysis:
+- One more convolutional layer and two more layers of 1x1 are added to achieve this and reducing number of parameters
+- Next, I will try to increase the capacity of the model by increasing the number of parameters
 
-- Tried using the `ReduceLROnPlateau` scheduler
-- Model started converging but overshoot after achieving 99.13% on the test data
-- Model couldn't achieve the desired accuracy but reached close to it
-- Need to revisit the augmentation again before fixing on LR scheduler strategy
+
+
+---
+
+
+
+## Code-7: Increase the Capacity
+
+<a target="_blank" href="https://colab.research.google.com/github/Shilpaj1994/ERA/blob/master/Session7/F7.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
+
+### Target:
+
+- Increase the capacity of the model
+
+### Results:
+
+- Parameters: 7,884
+- Best Training Accuracy: 98.67
+- Best Test Accuracy: 99.38
+
+```python
+----------------------------------------------------------------
+        Layer (type)               Output Shape         Param #
+================================================================
+            Conv2d-1           [-1, 10, 26, 26]              90
+       BatchNorm2d-2           [-1, 10, 26, 26]              20
+            Conv2d-3           [-1, 10, 24, 24]             900
+       BatchNorm2d-4           [-1, 10, 24, 24]              20
+            Conv2d-5           [-1, 10, 22, 22]             900
+       BatchNorm2d-6           [-1, 10, 22, 22]              20
+            Conv2d-7           [-1, 10, 20, 20]             900
+       BatchNorm2d-8           [-1, 10, 20, 20]              20
+            Conv2d-9           [-1, 10, 20, 20]             100
+      BatchNorm2d-10           [-1, 10, 20, 20]              20
+        MaxPool2d-11           [-1, 10, 10, 10]               0
+           Conv2d-12             [-1, 14, 8, 8]           1,260
+      BatchNorm2d-13             [-1, 14, 8, 8]              28
+           Conv2d-14             [-1, 14, 6, 6]           1,764
+      BatchNorm2d-15             [-1, 14, 6, 6]              28
+           Conv2d-16             [-1, 13, 4, 4]           1,638
+      BatchNorm2d-17             [-1, 13, 4, 4]              26
+AdaptiveAvgPool2d-18             [-1, 13, 1, 1]               0
+           Conv2d-19             [-1, 10, 1, 1]             130
+      BatchNorm2d-20             [-1, 10, 1, 1]              20
+================================================================
+Total params: 7,884
+Trainable params: 7,884
+Non-trainable params: 0
+----------------------------------------------------------------
+Input size (MB): 0.00
+Forward/backward pass size (MB): 0.42
+Params size (MB): 0.03
+Estimated Total Size (MB): 0.45
+----------------------------------------------------------------
+```
+
+![image-20230618163334375](Data/image-20230618163334375.png)
+
+![image-20230618165646627](Data/image-20230618165646627.png)
+
+### Analysis:
+- Model is consistently achieving 99.3+ accuracy in the last few epochs
+- Need to push little bit by using learning rate scheduler
+
+
+
+---
+
+
+
+## Code-8: The LR Scheduler
+
+<a target="_blank" href="https://colab.research.google.com/github/Shilpaj1994/ERA/blob/master/Session7/F8.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
+
+### Target:
+
+- Use OneCycle LR scheduler to achieve the target
+
+### Results:
+
+- Parameters: 7,884
+- Best Training Accuracy: 98.88
+- Best Test Accuracy: 99.44
+
+```python
+----------------------------------------------------------------
+        Layer (type)               Output Shape         Param #
+================================================================
+            Conv2d-1           [-1, 10, 26, 26]              90
+       BatchNorm2d-2           [-1, 10, 26, 26]              20
+            Conv2d-3           [-1, 10, 24, 24]             900
+       BatchNorm2d-4           [-1, 10, 24, 24]              20
+            Conv2d-5           [-1, 10, 22, 22]             900
+       BatchNorm2d-6           [-1, 10, 22, 22]              20
+            Conv2d-7           [-1, 10, 20, 20]             900
+       BatchNorm2d-8           [-1, 10, 20, 20]              20
+            Conv2d-9           [-1, 10, 20, 20]             100
+      BatchNorm2d-10           [-1, 10, 20, 20]              20
+        MaxPool2d-11           [-1, 10, 10, 10]               0
+           Conv2d-12             [-1, 14, 8, 8]           1,260
+      BatchNorm2d-13             [-1, 14, 8, 8]              28
+           Conv2d-14             [-1, 14, 6, 6]           1,764
+      BatchNorm2d-15             [-1, 14, 6, 6]              28
+           Conv2d-16             [-1, 13, 4, 4]           1,638
+      BatchNorm2d-17             [-1, 13, 4, 4]              26
+AdaptiveAvgPool2d-18             [-1, 13, 1, 1]               0
+           Conv2d-19             [-1, 10, 1, 1]             130
+      BatchNorm2d-20             [-1, 10, 1, 1]              20
+================================================================
+Total params: 7,884
+Trainable params: 7,884
+Non-trainable params: 0
+----------------------------------------------------------------
+Input size (MB): 0.00
+Forward/backward pass size (MB): 0.42
+Params size (MB): 0.03
+Estimated Total Size (MB): 0.45
+----------------------------------------------------------------
+```
+
+![image-20230618163643353](Data/image-20230618163643353.png)
+
+![image-20230618163710558](Data/image-20230618163710558.png)
+
+### Analysis:
+- With the OneCycle LR scheduler, the target of 99.40% is achieved consistently in the last 3 epochs
