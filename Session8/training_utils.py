@@ -21,7 +21,7 @@ def get_correct_predictions(prediction, labels):
     return prediction.argmax(dim=1).eq(labels).sum().item()
 
 
-def train(model, device, train_loader, optimizer, criterion):
+def train(model, device, train_loader, optimizer, criterion, scheduler=None):
     """
     Function to train model on the training dataset
     :param model: Model architecture
@@ -29,6 +29,7 @@ def train(model, device, train_loader, optimizer, criterion):
     :param train_loader: DataLoader for training dataset
     :param optimizer: Optimization algorithm to be used for updating weights
     :param criterion: Loss function for training
+    :param scheduler: Scheduler for learning rate
     """
     # Enable layers like Dropout for model training
     model.train()
@@ -60,6 +61,9 @@ def train(model, device, train_loader, optimizer, criterion):
         # Backpropagation
         loss.backward()
         optimizer.step()
+
+        if scheduler:
+            scheduler.step()
 
         # Get total number of correct predictions
         correct += get_correct_predictions(pred, target)

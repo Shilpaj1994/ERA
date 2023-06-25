@@ -19,36 +19,86 @@ class Session8(nn.Module):
         # Initialize the Module class
         super(Session8, self).__init__()
 
+        dropout_value = 0.1
+
         # Convolutional Block-1
-        self.conv1 = nn.Conv2d(3, 16, kernel_size=3, bias=False, padding=0)     # 32 > 30 | 3
-        self.conv2 = nn.Conv2d(16, 32, kernel_size=3, bias=False, padding=0)    # 30 > 28 | 5
+        self.conv_block1 = nn.Sequential(
+            nn.Conv2d(in_channels=3, out_channels=20, kernel_size=3, bias=False, padding=1),
+            nn.ReLU(),
+            nn.BatchNorm2d(20),
+            nn.Dropout(dropout_value)
+        )
+        self.conv_block2 = nn.Sequential(
+            nn.Conv2d(in_channels=20, out_channels=20, kernel_size=3, bias=False, padding=1),
+            nn.ReLU(),
+            nn.BatchNorm2d(20),
+            nn.Dropout(dropout_value)
+        )
 
         # Transitional Block-1
-        self.point1 = nn.Conv2d(32, 16, kernel_size=1, bias=False)              # 28 > 28 | 5
-        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)                      # 28 > 14 | 6
+        self.conv_point1 = nn.Sequential(
+            nn.Conv2d(in_channels=20, out_channels=16, kernel_size=1, bias=False, padding=0)
+        )
+        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
 
         # Convolutional Block-2
-        self.conv3 = nn.Conv2d(16, 20, kernel_size=3, bias=False, padding=1)    # 14 > 14 | 10
-        self.conv4 = nn.Conv2d(20, 24, kernel_size=3, bias=False, padding=1)    # 14 > 14 | 14
-        self.conv5 = nn.Conv2d(24, 32, kernel_size=3, bias=False, padding=1)    # 14 > 14 | 18
+        self.conv_block3 = nn.Sequential(
+            nn.Conv2d(in_channels=16, out_channels=26, kernel_size=3, bias=False, padding=1),
+            nn.ReLU(),
+            nn.BatchNorm2d(26),
+            nn.Dropout(dropout_value)
+        )
+        self.conv_block4 = nn.Sequential(
+            nn.Conv2d(in_channels=26, out_channels=26, kernel_size=3, bias=False, padding=1),
+            nn.ReLU(),
+            nn.BatchNorm2d(26),
+            nn.Dropout(dropout_value)
+        )
+        self.conv_block5 = nn.Sequential(
+            nn.Conv2d(in_channels=26, out_channels=26, kernel_size=3, bias=False, padding=1),
+            nn.ReLU(),
+            nn.BatchNorm2d(26),
+            nn.Dropout(dropout_value)
+        )
 
         # Transitional Block-2
-        self.point2 = nn.Conv2d(32, 16, kernel_size=1, bias=False)              # 8 > 8 | 18
-        self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)                      # 8 > 4 | 20
+        self.conv_point2 = nn.Sequential(
+            nn.Conv2d(in_channels=26, out_channels=16, kernel_size=1, bias=False, padding=0)
+        )
+        self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
 
         # Convolutional Block-3
-        self.conv7 = nn.Conv2d(16, 20, kernel_size=3, bias=False, padding=1)    # 4 > 4 | 28
-        self.conv8 = nn.Conv2d(20, 24, kernel_size=3, bias=False, padding=1)    # 4 > 4 | 36
-        self.conv9 = nn.Conv2d(24, 32, kernel_size=2, bias=False, padding=1)    # 4 > 4 | 44
+        self.conv_block7 = nn.Sequential(
+            nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, bias=False, padding=1),
+            nn.ReLU(),
+            nn.BatchNorm2d(32),
+            nn.Dropout(dropout_value)
+        )
+        self.conv_block8 = nn.Sequential(
+            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, bias=False, padding=1),
+            nn.ReLU(),
+            nn.BatchNorm2d(32),
+            nn.Dropout(dropout_value)
+        )
+        self.conv_block9 = nn.Sequential(
+            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, bias=False, padding=1),
+            nn.ReLU(),
+            nn.BatchNorm2d(32),
+            nn.Dropout(dropout_value)
+        )
 
         # Global Average Pooling
-        self.gap = nn.AdaptiveAvgPool2d(1)
+        self.gap = nn.Sequential(
+            nn.AdaptiveAvgPool2d(1)
+        )
 
         # Output Layer
-        self.point3 = nn.Conv2d(32, 10, kernel_size=1, bias=False)
-
-        # Dropout
-        self.dropout = nn.Dropout(0.07)
+        self.conv_block10 = nn.Sequential(
+            nn.Conv2d(in_channels=32, out_channels=10, kernel_size=1, bias=False, padding=0),
+            # nn.ReLU(),
+            # nn.BatchNorm2d(32),
+            # nn.Dropout(dropout_value)
+        )
 
         # Batch Normalization
         if normalization == 'batch':
@@ -83,40 +133,32 @@ class Session8(nn.Module):
         :return: Output of the model
         """
         # Convolutional Block-1
-        x = F.relu(self.norm1(self.conv1(x)))
-        x = self.dropout(x)
-        x = F.relu(self.norm2(self.conv2(x)))
-        x = self.dropout(x)
+        x = self.conv_block1(x)
+        x = x + self.conv_block2(x)
 
         # Transitional Block-1
-        x = self.norm_p1(self.point1(x))
-        x_p1 = self.pool1(x)
+        x = self.conv_point1(x)
+        x = self.pool1(x)
 
         # Convolutional Block-2
-        x3 = F.relu(self.norm3(self.conv3(x_p1)))
-        x = self.dropout(x3)
-        x4 = F.relu(self.norm4(self.conv4(x)))
-        x = self.dropout(x4)
-        x5 = self.norm5(self.conv5(x))
-        x = self.dropout(F.relu(x5))
+        x = self.conv_block3(x)
+        x = x + self.conv_block4(x)
+        x = x + self.conv_block5(x)
 
         # Transitional Block-2
-        x = self.norm_p2(self.point2(x))
-        x_p2 = self.pool2(x)
+        x = self.conv_point2(x)
+        x = self.pool2(x)
 
         # Convolutional Block-3
-        x7 = F.relu(self.norm3(self.conv7(x_p2)))
-        x = self.dropout(x7)
-        x8 = F.relu(self.norm4(self.conv8(x)))
-        x = self.dropout(x8)
-        x = self.conv9(x)
+        x = self.conv_block7(x)
+        x = x + self.conv_block8(x)
+        x = x + self.conv_block9(x)
 
         x = self.gap(x)
-        x = self.point3(x)
+        x = self.conv_block10(x)
 
         x = x.view(-1, 10)
         return F.log_softmax(x, dim=1)
-
 
 # -------------------------------- Session-7 --------------------------------
 class Session7_1(nn.Module):
