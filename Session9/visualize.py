@@ -161,7 +161,7 @@ def visualize_mnist_augmentation(data_set, data_transforms):
         if count == total_augmentations - 1:
             break
         plt.subplot(math.ceil(total_augmentations / 5), 5, count + 1)
-        img = trans(sample).squeeze(0).to('cpu')
+        img = trans(sample).to('cpu')
         plt.imshow(np.transpose(img, (1, 2, 0)), cmap='gray')
         plt.title(key)
         plt.xticks([])

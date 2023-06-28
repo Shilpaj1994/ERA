@@ -87,7 +87,7 @@ def get_mnist_statistics(data_set, data_set_type='Train'):
     images, labels = dataiter[0], dataiter[1]
 
     print(images.shape)
-    print(labels.shape)
+    print(labels)
 
     # Let's visualize some of the images
     plt.imshow(images[0].numpy().squeeze(), cmap='gray')
