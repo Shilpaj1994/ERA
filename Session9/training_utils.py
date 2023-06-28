@@ -62,6 +62,7 @@ def train(model, device, train_loader, optimizer, criterion, scheduler=None):
         loss.backward()
         optimizer.step()
 
+        # Use learning rate scheduler if defined
         if scheduler:
             scheduler.step()
 

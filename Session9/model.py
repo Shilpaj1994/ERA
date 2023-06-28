@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 Script containing model architectures
+Author: Shilpaj Bhalerao
 """
 # Third-Party Imports
 import torch.nn as nn
@@ -11,14 +12,17 @@ class Session9Net(nn.Module):
     """
     Model for Session-9 CIFAR10 dataset
     """
-    def __init__(self, normalization='batch'):
+    def __init__(self):
         """
         Constructor
         """
         # Initialize the Module class
         super(Session9Net, self).__init__()
 
+        # Dropout value of 10%
         self.dropout_value = 0.1
+
+        # Kernel with a dilation of 2
         self.dilation = 2
 
         # Convolutional Block-1
@@ -42,9 +46,7 @@ class Session9Net(nn.Module):
         self.conv_block12 = self.standard_conv_layer(in_channels=64, out_channels=64, kernel_size=3, padding=1)
 
         # Global Average Pooling
-        self.gap = nn.Sequential(
-            nn.AdaptiveAvgPool2d(1)
-        )
+        self.gap = nn.Sequential(nn.AdaptiveAvgPool2d(1))
 
         # Output Layer
         self.conv_block14 = self.standard_conv_layer(in_channels=64, out_channels=10, kernel_size=1, padding=0, last_layer=True)
@@ -53,7 +55,7 @@ class Session9Net(nn.Module):
         """
         Forward pass for model training
         :param x: Input layer
-        :return: Output of the model
+        :return: Model Prediction
         """
         # Convolutional Block-1
         x = self.conv_block1(x)
@@ -82,9 +84,24 @@ class Session9Net(nn.Module):
         x = x.view(-1, 10)
         return F.log_softmax(x, dim=1)
 
-    def standard_conv_layer(self, in_channels, out_channels, kernel_size=3, padding=0, stride=1, normalization="batch", last_layer=False, conv_type="standard"):
+    def standard_conv_layer(self, in_channels: int,
+                            out_channels: int,
+                            kernel_size: int = 3,
+                            padding: int = 0,
+                            stride: int = 1,
+                            normalization: str = "batch",
+                            last_layer: bool = False,
+                            conv_type: str = "standard"):
         """
         Method to return a standard convolution block
+        :param in_channels: Number of input channels
+        :param out_channels: Number of output channels
+        :param kernel_size: Size of the kernel used in the layer
+        :param padding: Padding used in the layer
+        :param stride: Stride used for convolution
+        :param normalization: Type of normalization technique used
+        :param last_layer: Flag to indicate if the layer is last convolutional layer of the network
+        :param conv_type: Type of convolutional layer
         """
         # Select normalization type
         if normalization == "layer":
@@ -106,9 +123,7 @@ class Session9Net(nn.Module):
 
         # For last layer only return the convolution output
         if last_layer:
-            return nn.Sequential(
-                conv_layer
-            )
+            return nn.Sequential(conv_layer)
         return nn.Sequential(
             conv_layer,
             nn.ReLU(),
@@ -120,6 +135,10 @@ class Session9Net(nn.Module):
     def depthwise_conv(in_channels, out_channels, stride=1, padding=0):
         """
         Method to return the depthwise separable convolution layer
+        :param in_channels: Number of input channels
+        :param out_channels: Number of output channels
+        :param padding: Padding used in the layer
+        :param stride: Stride used for convolution
         """
         return nn.Sequential(
             nn.Conv2d(in_channels=in_channels, out_channels=in_channels, stride=stride, groups=in_channels, kernel_size=3, bias=False, padding=padding),
@@ -130,6 +149,11 @@ class Session9Net(nn.Module):
     def dilated_conv(in_channels, out_channels, stride=1, padding=0, dilation=1):
         """
         Method to return the dilated convolution layer
+        :param in_channels: Number of input channels
+        :param out_channels: Number of output channels
+        :param stride: Stride used for convolution
+        :param padding: Padding used in the layer
+        :param dilation: Dilation value for a kernel
         """
         return nn.Sequential(
             nn.Conv2d(in_channels=in_channels, out_channels=out_channels, stride=stride, kernel_size=3, bias=False,

@@ -3,7 +3,6 @@
 Utility Script containing functions to be used for training
 """
 # Standard Library Imports
-import math
 from typing import NoReturn
 
 # Third-Party Imports
@@ -11,7 +10,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 from torchsummary import summary
-from tqdm import tqdm
 
 
 def get_summary(model: 'object of model architecture', input_size: tuple) -> NoReturn:
@@ -24,7 +22,6 @@ def get_summary(model: 'object of model architecture', input_size: tuple) -> NoR
     device = torch.device("cuda" if use_cuda else "cpu")
     network = model.to(device)
     summary(network, input_size=input_size)
-
 
 
 def get_misclassified_data(model, device, test_loader):
@@ -66,27 +63,28 @@ def get_misclassified_data(model, device, test_loader):
     return misclassified_data
 
 
-def get_data_statistics(train, train_loader):
+# -------------------- DATA STATISTICS --------------------
+def get_mnist_statistics(data_set, data_set_type='Train'):
     """
     Function to return the statistics of the training data
-    :param train: Training dataset
-    :param train_loader: DataLoader for Training dataset
+    :param data_set: Training dataset
+    :param data_set_type: Type of dataset [Train/Test/Val]
     """
     # We'd need to convert it into Numpy! Remember above we have converted it into tensors already
-    train_data = train.train_data
-    train_data = train.transform(train_data.numpy())
+    train_data = data_set.train_data
+    train_data = data_set.transform(train_data.numpy())
 
-    print('[Train]')
-    print(' - Numpy Shape:', train.train_data.cpu().numpy().shape)
-    print(' - Tensor Shape:', train.train_data.size())
+    print(f'[{data_set_type}]')
+    print(' - Numpy Shape:', data_set.train_data.cpu().numpy().shape)
+    print(' - Tensor Shape:', data_set.train_data.size())
     print(' - min:', torch.min(train_data))
     print(' - max:', torch.max(train_data))
     print(' - mean:', torch.mean(train_data))
     print(' - std:', torch.std(train_data))
     print(' - var:', torch.var(train_data))
 
-    dataiter = iter(train_loader)
-    images, labels = next(dataiter)
+    dataiter = next(iter(data_set))
+    images, labels = dataiter[0], dataiter[1]
 
     print(images.shape)
     print(labels.shape)
@@ -94,11 +92,12 @@ def get_data_statistics(train, train_loader):
     # Let's visualize some of the images
     plt.imshow(images[0].numpy().squeeze(), cmap='gray')
 
-# -------------------- CIFAR --------------------
 
 def get_cifar_property(images, operation):
     """
     Get the property on each channel of the CIFAR
+    :param images: Get the property value on the images
+    :param operation: Mean, std, Variance, etc
     """
     param_r = eval('images[:, 0, :, :].' + operation + '()')
     param_g = eval('images[:, 1, :, :].' + operation + '()')

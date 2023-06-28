@@ -5,6 +5,7 @@ Author: Shilpaj Bhalerao
 Date: Jun 25, 2023
 """
 # Standard Library Imports
+from typing import Tuple
 
 # Third-Party Imports
 from torchvision import datasets, transforms
@@ -24,7 +25,7 @@ class AlbumDataset(datasets.CIFAR10):
         """
         super().__init__(root=root, train=train, download=download, transform=transform)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> Tuple:
         """
         Method to return image and its label
         :param index: Index of image and label in the dataset
