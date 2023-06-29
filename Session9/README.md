@@ -220,7 +220,9 @@ In the notebook, I followed the below steps:
 
   
 
-- Import the model and print the model summary
+- Import the model and print the model summary. 
+
+  Here, **Dilated kernels** are used instead of MaxPooling to reduce the size of the input channels
 
   ```python
   ----------------------------------------------------------------
@@ -230,76 +232,89 @@ In the notebook, I followed the below steps:
                 ReLU-2           [-1, 32, 32, 32]               0
          BatchNorm2d-3           [-1, 32, 32, 32]              64
              Dropout-4           [-1, 32, 32, 32]               0
-              Conv2d-5           [-1, 32, 32, 32]             288
-              Conv2d-6           [-1, 32, 34, 34]           1,024
-                ReLU-7           [-1, 32, 34, 34]               0
-         BatchNorm2d-8           [-1, 32, 34, 34]              64
-             Dropout-9           [-1, 32, 34, 34]               0
-             Conv2d-10           [-1, 32, 16, 16]           9,216
-               ReLU-11           [-1, 32, 16, 16]               0
-        BatchNorm2d-12           [-1, 32, 16, 16]              64
-            Dropout-13           [-1, 32, 16, 16]               0
-             Conv2d-14           [-1, 40, 16, 16]          11,520
-               ReLU-15           [-1, 40, 16, 16]               0
-        BatchNorm2d-16           [-1, 40, 16, 16]              80
-            Dropout-17           [-1, 40, 16, 16]               0
-             Conv2d-18           [-1, 40, 16, 16]          14,400
-               ReLU-19           [-1, 40, 16, 16]               0
-        BatchNorm2d-20           [-1, 40, 16, 16]              80
-            Dropout-21           [-1, 40, 16, 16]               0
-             Conv2d-22             [-1, 40, 7, 7]          14,400
-               ReLU-23             [-1, 40, 7, 7]               0
-        BatchNorm2d-24             [-1, 40, 7, 7]              80
-            Dropout-25             [-1, 40, 7, 7]               0
-             Conv2d-26             [-1, 40, 7, 7]          14,400
+          
+              Conv2d-5           [-1, 32, 32, 32]           9,216
+                ReLU-6           [-1, 32, 32, 32]               0
+         BatchNorm2d-7           [-1, 32, 32, 32]              64
+             Dropout-8           [-1, 32, 32, 32]               0
+          
+              Conv2d-9           [-1, 32, 15, 15]           9,216
+               ReLU-10           [-1, 32, 15, 15]               0
+        BatchNorm2d-11           [-1, 32, 15, 15]              64
+            Dropout-12           [-1, 32, 15, 15]               0
+          
+             Conv2d-13           [-1, 38, 15, 15]          10,944
+               ReLU-14           [-1, 38, 15, 15]               0
+        BatchNorm2d-15           [-1, 38, 15, 15]              76
+            Dropout-16           [-1, 38, 15, 15]               0
+          
+             Conv2d-17           [-1, 38, 15, 15]          12,996
+               ReLU-18           [-1, 38, 15, 15]               0
+        BatchNorm2d-19           [-1, 38, 15, 15]              76
+            Dropout-20           [-1, 38, 15, 15]               0
+          
+             Conv2d-21             [-1, 38, 7, 7]          12,996
+               ReLU-22             [-1, 38, 7, 7]               0
+        BatchNorm2d-23             [-1, 38, 7, 7]              76
+            Dropout-24             [-1, 38, 7, 7]               0
+          
+             Conv2d-25             [-1, 38, 7, 7]             342
+             Conv2d-26             [-1, 40, 7, 7]           1,520
                ReLU-27             [-1, 40, 7, 7]               0
         BatchNorm2d-28             [-1, 40, 7, 7]              80
             Dropout-29             [-1, 40, 7, 7]               0
+          
              Conv2d-30             [-1, 40, 7, 7]          14,400
                ReLU-31             [-1, 40, 7, 7]               0
         BatchNorm2d-32             [-1, 40, 7, 7]              80
             Dropout-33             [-1, 40, 7, 7]               0
+          
              Conv2d-34             [-1, 40, 3, 3]          14,400
                ReLU-35             [-1, 40, 3, 3]               0
         BatchNorm2d-36             [-1, 40, 3, 3]              80
             Dropout-37             [-1, 40, 3, 3]               0
+          
              Conv2d-38             [-1, 64, 3, 3]          23,040
                ReLU-39             [-1, 64, 3, 3]               0
         BatchNorm2d-40             [-1, 64, 3, 3]             128
             Dropout-41             [-1, 64, 3, 3]               0
+          
              Conv2d-42             [-1, 64, 3, 3]          36,864
                ReLU-43             [-1, 64, 3, 3]               0
         BatchNorm2d-44             [-1, 64, 3, 3]             128
             Dropout-45             [-1, 64, 3, 3]               0
+          
              Conv2d-46             [-1, 64, 3, 3]          36,864
                ReLU-47             [-1, 64, 3, 3]               0
         BatchNorm2d-48             [-1, 64, 3, 3]             128
             Dropout-49             [-1, 64, 3, 3]               0
+          
   AdaptiveAvgPool2d-50             [-1, 64, 1, 1]               0
+  
              Conv2d-51             [-1, 10, 1, 1]             640
   ================================================================
-  Total params: 193,376
-  Trainable params: 193,376
+  Total params: 185,346
+  Trainable params: 185,346
   Non-trainable params: 0
   ----------------------------------------------------------------
   Input size (MB): 0.01
-  Forward/backward pass size (MB): 3.50
-  Params size (MB): 0.74
-  Estimated Total Size (MB): 4.25
+  Forward/backward pass size (MB): 3.00
+  Params size (MB): 0.71
+  Estimated Total Size (MB): 3.72
   ----------------------------------------------------------------
   ```
 
 - Train the Model for 100 epochs to achieve accuracy of 85%
 
-  ![image-20230629105336893](Data/image-20230629105336893.png)
+  ![image-20230629171355964](Data/image-20230629171355964.png)
 
 - Visualize the training and test accuracies and losses
 
-  ![Training Process](Data/train_test.png)
+  ![Training Process](Data/train_test_latest.png)
 
 - Visualize the misclassified data
 
-  ![Misclassified Images](Data/misclassified.png)
+  ![Misclassified Images](Data/misclassified_latest.png)
 
   
 
