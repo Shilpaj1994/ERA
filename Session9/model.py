@@ -33,7 +33,7 @@ class Session9Net(nn.Module):
         self.conv_block6 = self.standard_conv_layer(in_channels=38, out_channels=38, kernel_size=3, padding=1, dilation=2, stride=2, conv_type="dilated")
 
         # Convolutional Block-3
-        self.conv_block7 = self.standard_conv_layer(in_channels=38, out_channels=40, kernel_size=3, padding=1)
+        self.conv_block7 = self.standard_conv_layer(in_channels=38, out_channels=40, kernel_size=3, padding=1, conv_type="depthwise")
         self.conv_block8 = self.standard_conv_layer(in_channels=40, out_channels=40, kernel_size=3, padding=2, dilation=2, conv_type="dilated")
         self.conv_block9 = self.standard_conv_layer(in_channels=40, out_channels=40, kernel_size=3, padding=1, dilation=2, stride=2, conv_type="dilated")
 
