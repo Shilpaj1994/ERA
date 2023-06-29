@@ -1,5 +1,21 @@
 # Advance Convolutions
 
+[Convolutional Layer](#convolutional-layer)
+
+[Point Convolution](#point-convolution)
+
+[Depthwise Separable Convolution Layer](#depthwise-separable-convolution-layer)
+
+[Dilated/Atrous Convolution Layer](#dilated_atrous-convolution-layer)
+
+[Spatial Separable Convolution](#spatial-separable-convolution)
+
+[Transpose Convolution](#transpose-convolution)
+
+[CIFAR10 Model](#cifar10-model)
+
++ [Code Details:](#code-details-)
+
 
 
 ### Convolutional Layer
@@ -39,17 +55,15 @@ nn.Conv2d(in_channels=3, out_channels=32, stride=1, kernel_size=3, bias=False, p
 - Used to **Combine Features**
 - It is also used to increase or decrease the number of channels in a layer
 
+- Here, 1x1 is used to reduce the number of channels from 192 to 32. It combines the features from multiple channels to preserve the information
+
+![Pointwise Convolution](Data/point.png)
+
 ```python
 # PyTorch Implementation
 nn.Conv2d(in_channels=3, out_channels=32, stride=1, kernel_size=1)   # Increase number of channels
 nn.Conv2d(in_channels=32, out_channels=10, stride=1, kernel_size=1)  # Decrease number of channels
 ```
-
-- Here, 1x1 is used to reduce the number of channels from 192 to 32. It combines the features from multiple channels to preserve the information
-
-![Pointwise Convolution](Data/point.png)
-
-
 
 
 
@@ -64,7 +78,7 @@ nn.Conv2d(in_channels=32, out_channels=10, stride=1, kernel_size=1)  # Decrease 
 
 ![Operation](Data/depthwise_1.png)
 
-
+- Below animation shows the operation of depthwise separable convolutions
 
 ![Operation](Data/depthwise-2.gif)
 
@@ -99,7 +113,7 @@ nn.Conv2d(in_channels=3, out_channels=10, stride=1, kernel_size=1, bias=False, p
 
 ![Dilated Operation](Data/dilated.gif)
 
-![Variable Dilation](Data/dilated_2.jpg)
+![Variable Dilation](Data/dilated_2.JPG)
 
 ```python
 # PyTorch Implementation
@@ -116,6 +130,8 @@ nn.Conv2d(in_channels=3, out_channels=32, stride=1, kernel_size=3, bias=False, p
 - It was immensely used in different variants of Xception-Inception Networks as well as in MobileNets
 - It is obsolete since mobile phone hardware is made powerful enough to handle normal convolutions
 
+![Spatially Separable Convolution](Data/spatially.gif)
+
 ```python
 # PyTorch Implementation
 nn.Sequential(
@@ -125,8 +141,6 @@ nn.Conv2d(in_channels=1, out_channels=32, stride=1, kernel_size=(1, 3), bias=Fal
 ```
 
 
-
-![](Data/spatially.gif)
 
 
 
