@@ -21,6 +21,7 @@ class Session8(nn.Module):
 
         # Dropout value of 10%
         self.dropout_value = 0.1
+        self.number_of_groups = 2
 
         # Convolutional Block-1
         self.conv_block1 = self.standard_conv_layer(in_channels=3, out_channels=20, kernel_size=3, padding=1, normalization=normalization)
@@ -41,7 +42,7 @@ class Session8(nn.Module):
 
         # Convolutional Block-3
         self.conv_block7 = self.standard_conv_layer(in_channels=16, out_channels=32, kernel_size=3, padding=1, normalization=normalization)
-        self.conv_block8 = self.standard_conv_layer(in_channels=32, out_channels=32, kernel_size=3, padding=2, normalization=normalization)
+        self.conv_block8 = self.standard_conv_layer(in_channels=32, out_channels=32, kernel_size=3, padding=1, normalization=normalization)
         self.conv_block9 = self.standard_conv_layer(in_channels=32, out_channels=32, kernel_size=3, padding=1, normalization=normalization)
 
         # Global Average Pooling
@@ -105,9 +106,9 @@ class Session8(nn.Module):
         if normalization == "layer":
             _norm_layer = nn.GroupNorm(1, out_channels)
         elif normalization == "group":
-            if not self.group:
+            if not self.number_of_groups:
                 raise ValueError("Value of group is not defined")
-            _norm_layer = nn.GroupNorm(self.groups, out_channels)
+            _norm_layer = nn.GroupNorm(self.number_of_groups, out_channels)
         else:
             _norm_layer = nn.BatchNorm2d(out_channels)
 
