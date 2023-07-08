@@ -1,4 +1,4 @@
-# Training Models Faster
+# Training Models Faster - One Cycle Policy
 
 <a target="_blank" href="https://colab.research.google.com/github/Shilpaj1994/ERA/blob/master/Session10/S10.ipynb">
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
@@ -21,6 +21,13 @@ This repository contains following files:
 
 - After importing all the modules and files in this repository, CIFAR10 statistics is printed
 
+  ```python
+  from utils import get_cifar_statistics
+  
+  get_cifar_statistics(train)
+  get_cifar_statistics(test, data_set_type="Test")
+  ```
+
   ```
   [Train]
    - Total Train Images: 50000
@@ -42,9 +49,35 @@ This repository contains following files:
 
 - Data samples are visualized
 
+  ```python
+  from visualize import display_cifar_data_samples
+  
+  DISPLAY_SAMPLES = 20
+  sample, _ = train[4]
+  display_cifar_data_samples(train, DISPLAY_SAMPLES, classes)
+  ```
+
+  
+
   ![Data Samples](Data/samples.png)
 
 - Augmentation is performed and visualized
+
+  ```python
+  from visualize import visualize_cifar_augmentation
+  
+  aug_train = AlbumDataset('./data', train=True, download=True)
+  
+  aug_set_transforms = {
+      'randomcrop': A.RandomCrop(height=32, width=32, p=1),
+      'horizontalflip': A.HorizontalFlip(p=1),
+      'cutout': A.CoarseDropout(max_holes=1, max_height=16, max_width=16, min_holes=1, min_height=1, min_width=1, fill_value=(0.49139968*255, 0.48215827*255, 0.44653124*255), mask_fill_value=None, p=1),
+      'normalize': A.Normalize((0.49139968, 0.48215827 ,0.44653124), (0.24703233, 0.24348505, 0.26158768)),
+      'standardize': ToTensorV2(),
+  }
+  
+  visualize_cifar_augmentation(aug_train, aug_set_transforms)
+  ```
 
   ![Augmentations](Data/augmentation.png)
 
@@ -59,31 +92,40 @@ This repository contains following files:
               Conv2d-1           [-1, 64, 32, 32]           1,728
          BatchNorm2d-2           [-1, 64, 32, 32]             128
                 ReLU-3           [-1, 64, 32, 32]               0
+              
               Conv2d-4          [-1, 128, 32, 32]          73,728
            MaxPool2d-5          [-1, 128, 16, 16]               0
          BatchNorm2d-6          [-1, 128, 16, 16]             256
                 ReLU-7          [-1, 128, 16, 16]               0
+          
               Conv2d-8          [-1, 128, 16, 16]         147,456
          BatchNorm2d-9          [-1, 128, 16, 16]             256
                ReLU-10          [-1, 128, 16, 16]               0
+          
              Conv2d-11          [-1, 128, 16, 16]         147,456
         BatchNorm2d-12          [-1, 128, 16, 16]             256
                ReLU-13          [-1, 128, 16, 16]               0
+          
              Conv2d-14          [-1, 256, 16, 16]         294,912
           MaxPool2d-15            [-1, 256, 8, 8]               0
         BatchNorm2d-16            [-1, 256, 8, 8]             512
                ReLU-17            [-1, 256, 8, 8]               0
+          
              Conv2d-18            [-1, 512, 8, 8]       1,179,648
           MaxPool2d-19            [-1, 512, 4, 4]               0
         BatchNorm2d-20            [-1, 512, 4, 4]           1,024
                ReLU-21            [-1, 512, 4, 4]               0
+          
              Conv2d-22            [-1, 512, 4, 4]       2,359,296
         BatchNorm2d-23            [-1, 512, 4, 4]           1,024
                ReLU-24            [-1, 512, 4, 4]               0
+          
              Conv2d-25            [-1, 512, 4, 4]       2,359,296
         BatchNorm2d-26            [-1, 512, 4, 4]           1,024
                ReLU-27            [-1, 512, 4, 4]               0
+          
           MaxPool2d-28            [-1, 512, 1, 1]               0
+          
              Linear-29                   [-1, 10]           5,120
   ================================================================
   Total params: 6,573,120
@@ -97,12 +139,101 @@ This repository contains following files:
   ----------------------------------------------------------------
   ```
 
+- Training Model
+
+  ```python
+  from training_utils import train, test, get_lr
+  
+  # Data to plot accuracy and loss graphs
+  train_losses = []
+  test_losses = []
+  train_acc = []
+  test_acc = []
+  learning_rates = []
+  test_incorrect_pred = {'images': [], 'ground_truths': [], 'predicted_vals': []}
+  
+  # Scheduler
+  scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer,
+                                                  max_lr=MAX_LR,
+                                                  steps_per_epoch=STEPS_PER_EPOCH,
+                                                  epochs=EPOCHS,
+                                                  pct_start=5/EPOCHS,
+                                                  div_factor=100,
+                                                  three_phase=False,
+                                                  final_div_factor=100,
+                                                  anneal_strategy="linear"
+                                                  )
+  
+  # For each epoch
+  for epoch in range(1, EPOCHS+1):
+      print(f'Epoch {epoch}')
+  
+      # Train the model on training dataset and append the training loss and accuracy
+      correct, processed, train_loss = train(model, device, train_loader, optimizer, criterion, scheduler)
+      train_acc.append(100 * correct / processed)
+      train_losses.append(train_loss / len(train_loader))
+      learning_rates.append(get_lr(optimizer))
+  
+      # Test the model's performance on test dataset and append the training loss and accuracy
+      correct, test_loss = test(model, device, test_loader, criterion)
+      test_acc.append(100. * correct / len(test_loader.dataset))
+      test_losses.append(test_loss)
+  ```
+
+  ```
+  Epoch 20
+  Train: Loss=0.3043 Batch_id=97 Accuracy=85.94: 100%|██████████| 98/98 [00:19<00:00,  4.98it/s]
+  Test set: Average loss: 0.0010, Accuracy: 8376/10000 (83.76%)
+  
+  Epoch 21
+  Train: Loss=0.3184 Batch_id=97 Accuracy=87.84: 100%|██████████| 98/98 [00:19<00:00,  5.08it/s]
+  Test set: Average loss: 0.0009, Accuracy: 8434/10000 (84.34%)
+  
+  Epoch 22
+  Train: Loss=0.3085 Batch_id=97 Accuracy=89.75: 100%|██████████| 98/98 [00:19<00:00,  5.06it/s]
+  Test set: Average loss: 0.0008, Accuracy: 8733/10000 (87.33%)
+  
+  Epoch 23
+  Train: Loss=0.2157 Batch_id=97 Accuracy=91.94: 100%|██████████| 98/98 [00:19<00:00,  5.04it/s]
+  Test set: Average loss: 0.0007, Accuracy: 8887/10000 (88.87%)
+  
+  Epoch 24
+  Train: Loss=0.0953 Batch_id=97 Accuracy=94.75: 100%|██████████| 98/98 [00:19<00:00,  5.08it/s]
+  Test set: Average loss: 0.0006, Accuracy: 9003/10000 (90.03%)
+  ```
+
+  
+
 - One Cycle Policy is used to train the models. Following is the graph showing model accuracy and loss on train and test dataset
+
+  ```python
+  # Print loss and accuracy
+  from visualize import display_loss_and_accuracies
+  
+  display_loss_and_accuracies(train_losses, train_acc, test_losses, test_acc)
+  ```
 
   ![Training Graphs](Data/train_test.png)
 
 - Misclassified images are visualized
 
+  ```python
+  from utils import get_misclassified_data
+  from visualize import display_cifar_misclassified_data
+  
+  # Denormalize the data using test mean and std deviation
+  inv_normalize = transforms.Normalize(
+      mean=[-0.4942/0.2466, -0.4851/0.2428, -0.4504/0.2615],
+      std=[1/0.2466, 1/0.2428, 1/0.2615]
+  )
+  
+  # Get the misclassified data from test dataset
+  misclassified_data = get_misclassified_data(model, device, test_loader)
+  
+  # Plot the misclassified data
+  display_cifar_misclassified_data(misclassified_data, classes, inv_normalize, number_of_samples=10)
+  ```
+  
   ![Test misclassified](Data/misclassified.png)
 
 
