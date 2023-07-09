@@ -16,7 +16,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sn
-from sklearn.metrices import confusion_matrix
+from sklearn.metrics import confusion_matrix
 
 
 # ---------------------------- DATA SAMPLES ----------------------------
