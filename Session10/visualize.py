@@ -6,6 +6,7 @@ Date: Jun 21, 2023
 """
 # Standard Library Imports
 import math
+from dataclasses import dataclass
 from typing import NoReturn
 
 # Third-Party Imports
@@ -13,6 +14,9 @@ import torch
 from torchvision import transforms
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sn
+from sklearn.metrices import confusion_matrix
 
 
 # ---------------------------- DATA SAMPLES ----------------------------
@@ -198,3 +202,182 @@ def display_loss_and_accuracies(train_losses: list,
     axs[1, 1].set_title("Test Accuracy")
 
 
+# ---------------------------- Feature Maps and Kernels ----------------------------
+
+@dataclass
+class ConvLayerInfo:
+    """
+    Data Class to store Conv layer's information
+    """
+    layer_number: int
+    weights: torch.nn.parameter.Parameter
+    layer_info: torch.nn.modules.conv.Conv2d
+
+
+class FeatureMapVisualizer:
+    """
+    Class to visualize Feature Map of the Layers
+    """
+    def __init__(self, model):
+        """
+        Contructor
+        :param model: Model Architecture
+        """
+        self.conv_layers = []
+        self.outputs = []
+        self.layerwise_kernels = None
+
+        # Disect the model
+        counter = 0
+        model_children = model.children()
+        for children in model_children:
+            if type(children) == nn.Sequential:
+                for child in children:
+                    if type(child) == nn.Conv2d:
+                        counter += 1
+                        self.conv_layers.append(ConvLayerInfo(layer_number=counter, 
+                                                              weights=child.weight,
+                                                              layer_info=child)
+                        )
+
+
+
+    def get_model_weights(self):
+        """
+        Method to get the model weights
+        """
+        model_weights = [layer.weights for layer in self.conv_layers]
+        return model_weights
+
+    def get_conv_layers(self):
+        """
+        Get the convolution layers
+        """
+        conv_layers = [layer.layer_info for layer in self.conv_layers]
+        return conv_layers
+
+    def get_total_conv_layers(self) -> int:
+        """
+        Get total number of convolution layers
+        """
+        out = self.get_conv_layers()
+        return len(out)
+
+    def feature_maps_of_all_kernels(self, image: torch.Tensor) -> dict:
+        """
+        Get feature maps from all the kernels of all the layers
+        :param image: Image to be passed to the network
+        """
+        image = image.unsqueeze(0)
+        image = image.to('cpu')
+        
+        outputs = {}
+
+        layers = self.get_conv_layers()
+        for index, layer in enumerate(layers):
+            image = layer(image)
+            outputs[str(layer)] = image
+        self.outputs = outputs
+        return outputs
+
+    def visualize_feature_map_of_kernel(self, image: torch.Tensor, kernel_number: int) -> None:
+        """
+        Function to visualize feature map of kernel number from each layer
+        :param image: Image passed to the network
+        :param kernel_number: Number of kernel in each layer (Should be less than or equal to the minimum number of kernel in the network)
+        """
+        # List to store processed feature maps
+        processed = []
+
+        # Get feature maps from all kernels of all the conv layers
+        outputs = self.feature_maps_of_all_kernels(image)
+
+        # Extract the n_th kernel's output from each layer and convert it to grayscale
+        for feature_map in outputs.values():
+            try:
+                feature_map = feature_map[0][kernel_number]
+            except IndexError:
+                print("Filter number should be less than the minimum number of channels in a network")
+                break
+            finally:
+                gray_scale = feature_map / feature_map.shape[0]
+                processed.append(gray_scale.data.numpy())
+        
+        # Plot the Feature maps with layer and kernel number
+        x_range = len(outputs)//5 + 4
+        fig = plt.figure(figsize=(10, 10))
+        for i in range(len(processed)):
+            a = fig.add_subplot(x_range, 5, i+1)
+            imgplot = plt.imshow(processed[i])
+            a.axis("off")
+            title = f"{list(outputs.keys())[i].split('(')[0]}_l{i+1}_k{kernel_number}"
+            a.set_title(title, fontsize=10)
+
+    def get_max_kernel_number(self):
+        """
+        Function to get maximum number of kernels in the network (for a layer)
+        """
+        layers = viz.get_conv_layers()
+        channels = [layer.out_channels for layer in layers]
+        self.layerwise_kernels = channels
+        return max(channels)
+    
+    def visualize_kernels_from_layer(self, layer_number: int):
+        """
+        Visualize Kernels from a layer
+        :param layer_number: Number of layer from which kernels are to be visualized
+        """
+        # Get the kernels number for each layer
+        self.get_max_kernel_number()
+
+        # Zero Indexing
+        layer_number = layer_number - 1
+        _kernels = self.layerwise_kernels[layer_number]
+
+        grid = math.ceil(math.sqrt(_kernels))
+
+        plt.figure(figsize=(5, 4))
+        model_weights = self.get_model_weights()
+        _layer_weights = model_weights[layer_number].cpu()
+        for i, filter in enumerate(_layer_weights):
+            plt.subplot(grid, grid, i+1)
+            plt.imshow(filter[0, :, :].detach(), cmap='gray')
+            plt.axis('off')
+        plt.show()
+
+
+# ---------------------------- Confusion Matrix ----------------------------
+def visualize_confusion_matrix(classes: list[str], device: str, model: 'DL Model', test_loader: torch.utils.data.DataLoader):
+    """
+    Function to generate and visualize confusion matrix
+    :param classes: List of class names
+    :param device: cuda/cpu
+    :param model: Model Architecture
+    :param test_loader: DataLoader for test set
+    """
+    nb_classes = len(classes)
+    device = 'cuda'
+    cm = torch.zeros(nb_classes, nb_classes)
+
+    model.eval()
+    with torch.no_grad():
+        for inputs, labels in test_loader:
+            inputs = inputs.to(device)
+            labels = labels.to(device)
+            model = model.to(device)
+
+            preds = model(inputs)
+            preds = preds.argmax(dim=1)
+        
+        for t, p in zip(labels.view(-1), preds.view(-1)):
+            cm[t, p] = cm[t, p] + 1
+
+    # Build confusion matrix
+    labels = labels.to('cpu')
+    preds = preds.to('cpu')
+    cf_matrix = confusion_matrix(labels, preds)
+    df_cm = pd.DataFrame(cf_matrix / np.sum(cf_matrix, axis=1)[:, None], 
+                        index = [i for i in classes],
+                        columns = [i for i in classes])
+    plt.figure(figsize = (12,7))
+    sn.heatmap(df_cm, annot=True)
