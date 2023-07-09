@@ -11,6 +11,7 @@ from typing import NoReturn
 
 # Third-Party Imports
 import torch
+import torch.nn as nn
 from torchvision import transforms
 import numpy as np
 import matplotlib.pyplot as plt
@@ -38,7 +39,7 @@ def display_mnist_data_samples(dataset: 'DataLoader object', number_of_samples: 
     # Plot the samples from the batch
     fig = plt.figure()
     x_count = 5
-    y_count = 1 if number_of_samples <= 5 else math.floor(number_of_samples/x_count)
+    y_count = 1 if number_of_samples <= 5 else math.floor(number_of_samples / x_count)
 
     # Plot the samples from the batch
     for i in range(number_of_samples):
@@ -70,7 +71,7 @@ def display_cifar_data_samples(data_set, number_of_samples: int, classes: list):
     # Plot the samples from the batch
     fig = plt.figure()
     x_count = 5
-    y_count = 1 if number_of_samples <= 5 else math.floor(number_of_samples/x_count)
+    y_count = 1 if number_of_samples <= 5 else math.floor(number_of_samples / x_count)
 
     for i in range(number_of_samples):
         plt.subplot(y_count, x_count, i + 1)
@@ -96,7 +97,7 @@ def display_cifar_misclassified_data(data: list,
     fig = plt.figure(figsize=(8, 5))
 
     x_count = 5
-    y_count = 1 if number_of_samples <= 5 else math.floor(number_of_samples/x_count)
+    y_count = 1 if number_of_samples <= 5 else math.floor(number_of_samples / x_count)
 
     for i in range(number_of_samples):
         plt.subplot(y_count, x_count, i + 1)
@@ -118,7 +119,7 @@ def display_mnist_misclassified_data(data: list,
     fig = plt.figure(figsize=(8, 5))
 
     x_count = 5
-    y_count = 1 if number_of_samples <= 5 else math.floor(number_of_samples/x_count)
+    y_count = 1 if number_of_samples <= 5 else math.floor(number_of_samples / x_count)
 
     for i in range(number_of_samples):
         plt.subplot(y_count, x_count, i + 1)
@@ -218,6 +219,7 @@ class FeatureMapVisualizer:
     """
     Class to visualize Feature Map of the Layers
     """
+
     def __init__(self, model):
         """
         Contructor
@@ -235,12 +237,10 @@ class FeatureMapVisualizer:
                 for child in children:
                     if type(child) == nn.Conv2d:
                         counter += 1
-                        self.conv_layers.append(ConvLayerInfo(layer_number=counter, 
+                        self.conv_layers.append(ConvLayerInfo(layer_number=counter,
                                                               weights=child.weight,
                                                               layer_info=child)
-                        )
-
-
+                                                )
 
     def get_model_weights(self):
         """
@@ -270,7 +270,7 @@ class FeatureMapVisualizer:
         """
         image = image.unsqueeze(0)
         image = image.to('cpu')
-        
+
         outputs = {}
 
         layers = self.get_conv_layers()
@@ -302,26 +302,26 @@ class FeatureMapVisualizer:
             finally:
                 gray_scale = feature_map / feature_map.shape[0]
                 processed.append(gray_scale.data.numpy())
-        
+
         # Plot the Feature maps with layer and kernel number
-        x_range = len(outputs)//5 + 4
+        x_range = len(outputs) // 5 + 4
         fig = plt.figure(figsize=(10, 10))
         for i in range(len(processed)):
-            a = fig.add_subplot(x_range, 5, i+1)
+            a = fig.add_subplot(x_range, 5, i + 1)
             imgplot = plt.imshow(processed[i])
             a.axis("off")
-            title = f"{list(outputs.keys())[i].split('(')[0]}_l{i+1}_k{kernel_number}"
+            title = f"{list(outputs.keys())[i].split('(')[0]}_l{i + 1}_k{kernel_number}"
             a.set_title(title, fontsize=10)
 
     def get_max_kernel_number(self):
         """
         Function to get maximum number of kernels in the network (for a layer)
         """
-        layers = viz.get_conv_layers()
+        layers = self.get_conv_layers()
         channels = [layer.out_channels for layer in layers]
         self.layerwise_kernels = channels
         return max(channels)
-    
+
     def visualize_kernels_from_layer(self, layer_number: int):
         """
         Visualize Kernels from a layer
@@ -340,14 +340,15 @@ class FeatureMapVisualizer:
         model_weights = self.get_model_weights()
         _layer_weights = model_weights[layer_number].cpu()
         for i, filter in enumerate(_layer_weights):
-            plt.subplot(grid, grid, i+1)
+            plt.subplot(grid, grid, i + 1)
             plt.imshow(filter[0, :, :].detach(), cmap='gray')
             plt.axis('off')
         plt.show()
 
 
 # ---------------------------- Confusion Matrix ----------------------------
-def visualize_confusion_matrix(classes: list[str], device: str, model: 'DL Model', test_loader: torch.utils.data.DataLoader):
+def visualize_confusion_matrix(classes: list[str], device: str, model: 'DL Model',
+                               test_loader: torch.utils.data.DataLoader):
     """
     Function to generate and visualize confusion matrix
     :param classes: List of class names
@@ -368,7 +369,7 @@ def visualize_confusion_matrix(classes: list[str], device: str, model: 'DL Model
 
             preds = model(inputs)
             preds = preds.argmax(dim=1)
-        
+
         for t, p in zip(labels.view(-1), preds.view(-1)):
             cm[t, p] = cm[t, p] + 1
 
@@ -376,8 +377,8 @@ def visualize_confusion_matrix(classes: list[str], device: str, model: 'DL Model
     labels = labels.to('cpu')
     preds = preds.to('cpu')
     cf_matrix = confusion_matrix(labels, preds)
-    df_cm = pd.DataFrame(cf_matrix / np.sum(cf_matrix, axis=1)[:, None], 
-                        index = [i for i in classes],
-                        columns = [i for i in classes])
-    plt.figure(figsize = (12,7))
+    df_cm = pd.DataFrame(cf_matrix / np.sum(cf_matrix, axis=1)[:, None],
+                         index=[i for i in classes],
+                         columns=[i for i in classes])
+    plt.figure(figsize=(12, 7))
     sn.heatmap(df_cm, annot=True)
