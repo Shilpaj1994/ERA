@@ -10,13 +10,13 @@ from dataclasses import dataclass
 from typing import NoReturn
 
 # Third-Party Imports
-import torch
-import torch.nn as nn
-from torchvision import transforms
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sn
+import torch
+import torch.nn as nn
+from torchvision import transforms
 from sklearn.metrics import confusion_matrix
 
 
