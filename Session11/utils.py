@@ -167,7 +167,7 @@ def display_gradcam_output(data: list,
     :param number_of_samples: Number of images to print
     """
     # Plot configuration
-    fig = plt.figure(figsize=(10, 5))
+    fig = plt.figure(figsize=(10, 10))
     x_count = 5
     y_count = 1 if number_of_samples <= 5 else math.floor(number_of_samples / x_count)
 
