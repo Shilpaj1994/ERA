@@ -155,7 +155,8 @@ def display_gradcam_output(data: list,
                            model: 'DL Model',
                            target_layers: list['model_layer'],
                            targets=None,
-                           number_of_samples: int = 10):
+                           number_of_samples: int = 10,
+                           transparency: float = 0.60):
     """
     Function to visualize GradCam output on the data
     :param data: List[Tuple(image, label)]
@@ -165,6 +166,7 @@ def display_gradcam_output(data: list,
     :param target_layers: Layers on which GradCam should be executed
     :param targets: Classes to be focused on for GradCam
     :param number_of_samples: Number of images to print
+    :param transparency: Weight of Normal image when mixed with activations
     """
     # Plot configuration
     fig = plt.figure(figsize=(10, 10))
@@ -190,7 +192,7 @@ def display_gradcam_output(data: list,
         rgb_img = rgb_img.numpy()
 
         # Mix the activations on the original image
-        visualization = show_cam_on_image(rgb_img, grayscale_cam, use_rgb=True, image_weight=0.75)
+        visualization = show_cam_on_image(rgb_img, grayscale_cam, use_rgb=True, image_weight=transparency)
 
         # Display the images on the plot
         plt.imshow(visualization)

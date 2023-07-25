@@ -271,3 +271,32 @@ This repository contains following files:
 ## GradCam
 
 - 
+
+**How do we create adversarial images?**
+
+1. Choose an input image and its label: Start with a clean image, labeled as a specific class, which you want the network to misclassify.
+2. Define the loss function: The loss function should measure the difference between the predicted class and the target class, usually the opposite of the true class.
+3. Calculate the gradient of the loss with respect to the input image: This step is done using backpropagation and it gives information on how the loss changes as the input image are changed.
+4. Perturb the input image: Add a small, but targeted perturbation to the input image, proportional to the gradient calculated in the previous step. This is done to maximize the loss and hence, change the predicted class.
+5. Repeat steps 3 and 4 until the desired misclassification is achieved: You may need to repeat these steps multiple times to generate a strong enough perturbation that causes the network to misclassify the image.
+6. Clip the pixel values of the perturbed image if needed: Clipping ensures that the perturbed image remains visually similar to the original image and falls within a specified range of pixel values.
+
+
+
+
+
+Grad-CAM algorithm for visualizing the important regions of an input image that contribute to the predictions of a VGG model can be implemented in the following steps:
+
+1. Load the pre-trained VGG model: The first step is to load a pre-trained VGG model, which has already been trained on a large dataset.
+2. Load the input image: Next, you would load the input image that you want to analyze.
+3. Inferring: Run the model's forward pass to obtain the final class scores and prediction.
+4. Output of the last Convolutional layer: Extract the feature maps of the last Convolutional layer before the final fully connected layers.
+5. Computing Gradients: Compute the gradients of the final class scores with respect to the feature maps.
+6. Pooling the Gradients: Pool the gradients spatially, typically by taking the average along the height and width dimensions.
+7. Weighing the outputs: Multiply the feature maps with the pooled gradients to get the weighted feature maps.
+8. Averaging Feature Maps along Channels: Sum the weighted feature maps along the channel dimension to get the final activation map.
+9. Normalizing the Heatmap: Normalize the activation map to obtain the final Grad-CAM heatmap, which highlights the regions of the input that were important for the prediction.
+
+ 
+
+This heatmap can be overlaid on the input image to visualize the regions that were important for the model's prediction. 
