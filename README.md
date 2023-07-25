@@ -52,3 +52,11 @@
 
 - Implementation of One Cycle Policy for faster training of models
 - Model to achieve 90%+ accuracy on CIFAR10 in 24 epochs
+
+
+
+## Session-11 [GradCam]
+
+- Train ResNet18 for 20 epochs with 85+% accuracy
+- Implemented GradCam to visualize the network activations for four block of the ResNet on the misclassified images
+
