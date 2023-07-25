@@ -190,7 +190,7 @@ def display_gradcam_output(data: list,
         rgb_img = rgb_img.numpy()
 
         # Mix the activations on the original image
-        visualization = show_cam_on_image(rgb_img, grayscale_cam, use_rgb=True, image_weight=0.5)
+        visualization = show_cam_on_image(rgb_img, grayscale_cam, use_rgb=True, image_weight=0.75)
 
         # Display the images on the plot
         plt.imshow(visualization)
