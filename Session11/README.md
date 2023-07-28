@@ -385,6 +385,50 @@ This heatmap can be overlaid on the input image to visualize the regions that we
 
 ## Optimizers
 
+- Optimizer algorithms like Gradient Descent and Stochastic Gradient Descent use constant value of learning rate while updating the weights
+
+- While Adaptive Optimizers such as Adagrad, Adadelta, RMSProp, and Adam use adaptive learning rates
+
+  
+
+### **Gradient Descent**: 
+
+- It calculates the gradient for the whole dataset and updates in a direction opposite to the gradients until we find local minima
+
+
+
+### **Stochastic Gradient Descent** 
+
+- It performs a parameter update for each batch instead of the whole dataset. This is much faster and can be further improved through momentum and learning rate finder
+
+
+
+### Adagrad
+
+- It is more preferable for a sparse data set as it makes big updates for infrequent parameters and small updates for frequent parameters 
+- It uses a different learning rate for each parameter at a time step based on the past gradients which were computed for that parameter. Thus we do not need to manually tune the learning rate. 
+
+
+
+### RMSProp
+
+- RMSprop adjusts the learning rate dynamically for each parameter in the model, instead of using a fixed learning rate for all parameters
+- It does this by dividing the learning rate by an exponentially decaying average of the squared gradients for each parameter. 
+- This helps to avoid oscillation or divergence in the optimization process, and allows the model to converge faster and more accurately
+- The features which are more frequent gets low learning rate change while the features will occur less frequently gets high learning rate change. This allows to learn faster from less frequent features 
+
+
+
+### Adam
+
+- It is the extension of RMSProp
+- It stands for Adaptive Moment Estimation. It also calculates a different learning rate. Adam works well in practice, is faster and outperforms other techniques
+- Here, we not only take the square of the loss but also the weighted value of the past gradient updates
+
+
+
+
+
 Below is the comparison of different optimizers trained on CIFAR10
 
 ![](Data/compare.png)
