@@ -1,5 +1,9 @@
 # Backpropagation
 
+**BackProp in Python:** <a target="_blank" href="https://colab.research.google.com/github/Shilpaj1994/ERA/blob/master/Session6/BackProp.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
+
 ### 1.1 Introduction
 
 - This article explains the functioning of Backpropagation algorithm and optimizer
