@@ -60,3 +60,9 @@
 - Train ResNet18 for 20 epochs with 85+% accuracy
 - Implemented GradCam to visualize the network activations for four block of the ResNet on the misclassified images
 
+
+
+## Session-12 [PyTorch Lightning and Gradio App]
+
+- Trained Session-10 model with PyTorch Lightning
+- Created a Gradio app for display misclassified images, GradCam output, Feature maps and Kernel from conv layers
