@@ -324,7 +324,7 @@ INFO:pytorch_lightning.utilities.rank_zero:`Trainer.fit` stopped: `max_epochs=24
 %tensorboard --logdir lightning_logs/
 ```
 
-![Graphs](Data/train_test.jpg)
+![Graphs](Data/train_test.JPG)
 
 
 
