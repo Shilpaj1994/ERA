@@ -10,7 +10,7 @@ import math
 # Third-Party Imports
 import numpy as np
 import matplotlib.pyplot as plt
-import albumentation as A
+import albumentations as A
 
 import torch
 import torch.nn as nn
