@@ -41,7 +41,8 @@ class Layers:
         """
         self.group = groups
 
-    def standard_conv_layer(self, in_channels: int,
+    @staticmethod
+    def standard_conv_layer(in_channels: int,
                             out_channels: int,
                             kernel_size: int = 3,
                             padding: int = 0,
@@ -49,7 +50,8 @@ class Layers:
                             dilation: int = 1,
                             normalization: str = "batch",
                             last_layer: bool = False,
-                            conv_type: str = "standard"):
+                            conv_type: str = "standard",
+                            groups: int = 1):
         """
         Method to return a standard convolution block
         :param in_channels: Number of input channels
@@ -61,14 +63,15 @@ class Layers:
         :param normalization: Type of normalization technique used
         :param last_layer: Flag to indicate if the layer is last convolutional layer of the network
         :param conv_type: Type of convolutional layer
+        :param groups: Number of Groups for Group Normalization
         """
         # Select normalization type
         if normalization == "layer":
             _norm_layer = nn.GroupNorm(1, out_channels)
         elif normalization == "group":
-            if not self.group:
+            if not groups:
                 raise ValueError("Value of group is not defined")
-            _norm_layer = nn.GroupNorm(self.groups, out_channels)
+            _norm_layer = nn.GroupNorm(groups, out_channels)
         else:
             _norm_layer = nn.BatchNorm2d(out_channels)
 
@@ -77,11 +80,11 @@ class Layers:
             conv_layer = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, stride=stride,
                                    kernel_size=kernel_size, bias=False, padding=padding)
         elif conv_type == "depthwise":
-            conv_layer = LITResNet.depthwise_conv(in_channels=in_channels, out_channels=out_channels, stride=stride,
-                                                  padding=padding)
+            conv_layer = Layers.depthwise_conv(in_channels=in_channels, out_channels=out_channels, stride=stride,
+                                               padding=padding)
         elif conv_type == "dilated":
-            conv_layer = LITResNet.dilated_conv(in_channels=in_channels, out_channels=out_channels, stride=stride,
-                                                padding=padding, dilation=dilation)
+            conv_layer = Layers.dilated_conv(in_channels=in_channels, out_channels=out_channels, stride=stride,
+                                             padding=padding, dilation=dilation)
 
         # For last layer only return the convolution output
         if last_layer:
@@ -154,11 +157,12 @@ class Layers:
         )
 
 
-class LITResNet(LightningModule):
+class LITResNet(LightningModule, Layers):
     """
     David's Model Architecture for Session-10 CIFAR10 dataset
     """
-    def __init__(self, class_names, data_dir=None):
+
+    def __init__(self, class_names, data_dir='/data/'):
         """
         Constructor
         """
@@ -209,7 +213,7 @@ class LITResNet(LightningModule):
         Method to initialize layers for the model
         """
         # Prep Layer
-        self.prep_layer = self.standard_conv_layer(in_channels=3, out_channels=64, kernel_size=3, padding=1, stride=1)
+        self.prep_layer = Layers.standard_conv_layer(in_channels=3, out_channels=64, kernel_size=3, padding=1, stride=1)
 
         # Convolutional Block-1
         self.custom_block1 = Layers.custom_block(input_channels=64, output_channels=128)
@@ -457,7 +461,7 @@ class LITResNet(LightningModule):
         """
         Function to run the model on test set and return misclassified images
         """
-        if self.micmisclassified_data:
+        if self.misclassified_data:
             return self.misclassified_data
 
         self.misclassified_data = []
