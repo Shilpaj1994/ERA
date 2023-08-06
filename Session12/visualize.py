@@ -312,6 +312,7 @@ class FeatureMapVisualizer:
             a.axis("off")
             title = f"{list(outputs.keys())[i].split('(')[0]}_l{i + 1}_k{kernel_number}"
             a.set_title(title, fontsize=10)
+        return fig
 
     def get_max_kernel_number(self):
         """
@@ -336,14 +337,15 @@ class FeatureMapVisualizer:
 
         grid = math.ceil(math.sqrt(_kernels))
 
-        plt.figure(figsize=(5, 4))
+        fig = plt.figure(figsize=(5, 4))
         model_weights = self.get_model_weights()
         _layer_weights = model_weights[layer_number].cpu()
         for i, filter in enumerate(_layer_weights):
             plt.subplot(grid, grid, i + 1)
             plt.imshow(filter[0, :, :].detach(), cmap='gray')
             plt.axis('off')
-        plt.show()
+        # plt.show()
+        return fig
 
 
 # ---------------------------- Confusion Matrix ----------------------------
