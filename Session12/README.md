@@ -328,6 +328,12 @@ INFO:pytorch_lightning.utilities.rank_zero:`Trainer.fit` stopped: `max_epochs=24
 
 
 
+### Display Misclassified IMages
+
+![](Data/misclassified.png)
+
+
+
 ### Save Misclassified Images
 
 - Misclassified Images are saved on the drive to be shown on the Gradio App
