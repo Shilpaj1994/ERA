@@ -5,3 +5,16 @@ __pycache__/
 Session-5/ipynb_checkpoints/
 */.ipynb_checkpoints/
 
+Session10/S10_3phase.ipynb
+Session10/sait.ipynb
+
+Session12/epoch=23-step=2112.ckpt
+
+Session13/PASCAL_VOC/*
+Session13/image.png
+Session13/main.ipynb
+Session13/main2.ipynb
+Session13/dataloader.ipynb
+Session13/Exp3.ipynb
+Session13/loss_1_1.py
+
