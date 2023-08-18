@@ -40,6 +40,8 @@ class YOLOv3(pl.LightningModule):
         self.test_dataset = None
         self.val_dataset = None
         self._data_directory = None
+        self.epochs = config.NUM_EPOCHS
+        self.batch_size = config.BATCH_SIZE
 
     def forward(self, x):
         outputs = []  # for each scale
@@ -252,7 +254,7 @@ class YOLOv3(pl.LightningModule):
             self.setup()
         return DataLoader(
             dataset=self.train_dataset,
-            batch_size=config.BATCH_SIZE,
+            batch_size=self.batch_size,
             num_workers=config.NUM_WORKERS,
             pin_memory=config.PIN_MEMORY,
             shuffle=True,
@@ -265,7 +267,7 @@ class YOLOv3(pl.LightningModule):
         """
         return DataLoader(
             dataset=self.val_dataset,
-            batch_size=config.BATCH_SIZE,
+            batch_size=self.batch_size,
             num_workers=config.NUM_WORKERS,
             pin_memory=config.PIN_MEMORY,
             shuffle=False,
@@ -278,7 +280,7 @@ class YOLOv3(pl.LightningModule):
         """
         return DataLoader(
             dataset=self.test_dataset,
-            batch_size=config.BATCH_SIZE,
+            batch_size=self.batch_size,
             num_workers=config.NUM_WORKERS,
             pin_memory=config.PIN_MEMORY,
             shuffle=False,
