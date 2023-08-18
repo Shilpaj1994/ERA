@@ -10,6 +10,7 @@ import torch.nn as nn
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.memory import garbage_collection_cuda
 from torch.utils.data import DataLoader
+from torchmetrics import MeanMetric
 
 # Local Imports
 import config
@@ -43,6 +44,8 @@ class YOLOv3(pl.LightningModule):
         self.epochs = config.NUM_EPOCHS
         self.batch_size = config.BATCH_SIZE
         self.enable_gc = "batch"
+        self.my_train_loss = MeanMetric()
+        self.my_val_loss = MeanMetric()
 
     def forward(self, x):
         outputs = []  # for each scale
@@ -176,7 +179,9 @@ class YOLOv3(pl.LightningModule):
                 + self.loss_fn(logits[1], y[1], self.scaled_anchors[1])
                 + self.loss_fn(logits[2], y[2], self.scaled_anchors[2])
             )
+        self.my_train_loss.update(loss, x.shape[0])
         self.log("train_loss", loss, prog_bar=True, on_epoch=True)
+        del x, y, logits
         return loss
 
     def validation_step(self, train_batch, batch_index):
@@ -189,7 +194,9 @@ class YOLOv3(pl.LightningModule):
                 + self.loss_fn(logits[1], y[1], self.scaled_anchors[1])
                 + self.loss_fn(logits[2], y[2], self.scaled_anchors[2])
             )
+        self.my_val_loss.update(loss, x.shape[0])
         self.log("val_loss", loss, prog_bar=True, on_epoch=True)
+        del x, y, logits
         return loss
 
     def test_step(self, batch, batch_idx):
