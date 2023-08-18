@@ -8,6 +8,7 @@ import torch
 import torch.optim as optim
 import torch.nn as nn
 import pytorch_lightning as pl
+from pytorch_lightning.utilities.memory import garbage_collection_cuda
 from torch.utils.data import DataLoader
 
 # Local Imports
@@ -283,3 +284,71 @@ class YOLOv3(pl.LightningModule):
             shuffle=False,
             drop_last=False,
         )
+
+    # ###########################################################################################
+    # ##################################### Memory Related Hooks ##################################
+    # ###########################################################################################
+
+    def on_train_batch_end(self, outputs, batch, batch_idx):
+        """
+        Garbage Collection for memory optimization
+            batch:
+            batch_idx:
+
+        Returns:
+
+        """
+        if self.enable_gc == 'batch':
+            garbage_collection_cuda()
+
+    def on_validation_batch_end(self, outputs, batch, batch_idx, dataloader_idx=0):
+        """
+        Garbage Collection for memory optimization
+            batch:
+            batch_idx:
+            dataloader_idx:
+
+        Returns:
+
+        """
+        if self.enable_gc == 'batch':
+            garbage_collection_cuda()
+
+    def on_predict_batch_end(self, outputs, batch, batch_idx, dataloader_idx=0):
+        """
+        Garbage Collection for memory optimization
+            batch:
+            batch_idx:
+            dataloader_idx:
+
+        Returns:
+
+        """
+        if self.enable_gc == 'batch':
+            garbage_collection_cuda()
+
+    def on_train_epoch_end(self):
+        """
+        Garbage Collection for memory optimization
+        """
+        if self.enable_gc == 'epoch':
+            garbage_collection_cuda()
+        print(
+            f"Epoch: {self.current_epoch}, Global Steps: {self.global_step}, Train Loss: {self.my_train_loss.compute()}")
+        self.my_train_loss.reset()
+
+    def on_validation_epoch_end(self):
+        """
+        Garbage Collection for memory optimization
+        """
+        if self.enable_gc == 'epoch':
+            garbage_collection_cuda()
+        print(f"Epoch: {self.current_epoch}, Global Steps: {self.global_step}, Val Loss: {self.my_val_loss.compute()}")
+        self.my_val_loss.reset()
+
+    def on_predict_epoch_end(self):
+        """
+        Garbage Collection for memory optimization
+        """
+        if self.enable_gc == 'epoch':
+            garbage_collection_cuda()
