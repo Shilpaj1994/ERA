@@ -38,6 +38,7 @@ class YOLOv3(pl.LightningModule):
         self.train_dataset = None
         self.test_dataset = None
         self.val_dataset = None
+        self._data_directory = None
 
     def forward(self, x):
         outputs = []  # for each scale
@@ -132,6 +133,20 @@ class YOLOv3(pl.LightningModule):
         """
         self._learning_rate = value
 
+    @property
+    def data_directory(self) -> str:
+        """
+        Method to return data directory
+        """
+        return self._data_directory
+
+    @data_directory.setter
+    def data_directory(self, address: str):
+        """
+        Method to set the data directory path
+        """
+        self._data_directory = address
+
     def set_training_config(self, *, epochs, batch_size):
         """
         Method to set parameters required for model training
@@ -193,10 +208,10 @@ class YOLOv3(pl.LightningModule):
         """
         Method to create Split the dataset into train, test and val
         """
-        train_csv_path = directory + config.DATASET + "/train.csv"
-        test_csv_path = directory + config.DATASET + "/test.csv"
-        IMG_DIR = directory + config.IMG_DIR
-        LABEL_DIR = directory + config.LABEL_DIR
+        train_csv_path = self._data_directory + config.DATASET + "/train.csv"
+        test_csv_path = self._data_directory + config.DATASET + "/test.csv"
+        IMG_DIR = self._data_directory + config.IMG_DIR
+        LABEL_DIR = self._data_directory + config.LABEL_DIR
         IMAGE_SIZE = config.IMAGE_SIZE
 
         # Assign train/val datasets for use in dataloaders
