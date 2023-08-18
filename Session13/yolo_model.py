@@ -23,7 +23,7 @@ class YOLOv3(pl.LightningModule):
     PyTorch Lightning Code for YOLOv3
     """
 
-    def __init__(self, in_channels=3, num_classes=80):
+    def __init__(self, in_channels=3, num_classes=20):
         """
         Constructor
         """
@@ -42,6 +42,7 @@ class YOLOv3(pl.LightningModule):
         self._data_directory = None
         self.epochs = config.NUM_EPOCHS
         self.batch_size = config.BATCH_SIZE
+        self.enable_gc = "batch"
 
     def forward(self, x):
         outputs = []  # for each scale
