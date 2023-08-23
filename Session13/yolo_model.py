@@ -183,9 +183,6 @@ class YOLOv3(pl.LightningModule):
         self.my_train_loss.update(loss, x.shape[0])
         self.log("train_loss", loss, prog_bar=True, on_epoch=True)
 
-        # Check Accuracy
-        check_class_accuracy(model=self.forward(x), loader=self.train_dataloader(), threshold=config.CONF_THRESHOLD)
-
         del x, y, logits
         return loss
 
@@ -201,9 +198,6 @@ class YOLOv3(pl.LightningModule):
             )
         self.my_val_loss.update(loss, x.shape[0])
         self.log("val_loss", loss, prog_bar=True, on_epoch=True)
-
-        # Check Accuracy
-        check_class_accuracy(model=self.forward(x), loader=self.test_dataloader(), threshold=config.CONF_THRESHOLD)
 
         del x, y, logits
         return loss
