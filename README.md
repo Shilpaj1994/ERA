@@ -66,3 +66,8 @@
 
 - Trained Session-10 model with PyTorch Lightning
 - Created a Gradio app for display misclassified images, GradCam output, Feature maps and Kernel from conv layers
+
+
+## Session-13 [Yolov3 Lightning and Gradio App]
+- Trained Yolov3 model for 40 epochs on PASCAL VOC dataset
+- Created a Gradio app to showcase the model output
