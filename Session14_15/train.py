@@ -6,17 +6,14 @@ Date: Aug 27, 2023
 """
 # Standard Library Imports
 import os
-import warnings
 from pathlib import Path
 
 # Third-Party Imports
 from tqdm import tqdm
-import torchmetrics
+import torchtext.datasets as datasets
 import torch
 import torch.nn as nn
-import torchtext.datasets as datasets
 from torch.utils.data import Dataset, DataLoader, random_split
-from torch.utils.tensorboard import SummaryWriter
 from torch.optim.lr_scheduler import LambdaLR
 
 # Huggingface datasets and tokenizers
@@ -25,6 +22,9 @@ from tokenizers import Tokenizer
 from tokenizers.models import WordLevel
 from tokenizer.trainers import WordLevelTrainer
 from tokenizers.pre_tokenizers import Whitespace
+
+import torchmetrics
+from torch.utils.tensorboard import SummaryWriter
 
 # Local Imports
 from config import get_config, get_weights_file_path
@@ -196,7 +196,7 @@ def get_ds(config):
     :return:
     """
     # It only has the train split, so we divide it ourselves
-    ds_raw = load_dataset('opus_books', f"{config['lang_src']}-{config['lang_tgt']}", split='train')
+    ds_raw = datasets.load_dataset('opus_books', f"{config['lang_src']}-{config['lang_tgt']}", split='train')
 
     # Build tokenizers
     tokenizer_src = get_or_build_tokenizer(config, ds_raw, config['lang_src'])
