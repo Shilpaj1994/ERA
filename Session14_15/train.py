@@ -20,7 +20,7 @@ from torch.optim.lr_scheduler import LambdaLR
 from datasets import load_dataset
 from tokenizers import Tokenizer
 from tokenizers.models import WordLevel
-from tokenizer.trainers import WordLevelTrainer
+from tokenizers.trainers import WordLevelTrainer
 from tokenizers.pre_tokenizers import Whitespace
 
 import torchmetrics
