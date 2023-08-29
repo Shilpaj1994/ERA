@@ -20,7 +20,7 @@ from torch.utils.tensorboard import SummaryWriter
 from torch.optim.lr_scheduler import LambdaLR
 
 # Huggingface datasets and tokenizers
-from dataset import load_dataset
+from datasets import load_dataset
 from tokenizers import Tokenizer
 from tokenizers.models import WordLevel
 from tokenizer.trainers import WordLevelTrainer
