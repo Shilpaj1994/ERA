@@ -196,7 +196,7 @@ def get_ds(config):
     :return:
     """
     # It only has the train split, so we divide it ourselves
-    ds_raw = datasets.load_dataset('opus_books', f"{config['lang_src']}-{config['lang_tgt']}", split='train')
+    ds_raw = load_dataset('opus_books', f"{config['lang_src']}-{config['lang_tgt']}", split='train')
 
     # Build tokenizers
     tokenizer_src = get_or_build_tokenizer(config, ds_raw, config['lang_src'])
