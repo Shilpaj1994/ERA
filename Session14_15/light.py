@@ -41,13 +41,14 @@ class LITTransformer(pl.LightningModule):
         # Initialize lightning module
         super().__init__()
 
+        # Prepare Data and Model
         self.config = config
+        self.prepare_data()
+        self.tokenizer_src = get_or_build_tokenizer(self.config, self.ds_raw, self.config['lang_src'])
+        self.tokenizer_tgt = get_or_build_tokenizer(self.config, self.ds_raw, self.config['lang_tgt'])
+        self.model = get_model(self.config, self.tokenizer_src.get_vocab_size(), self.tokenizer_tgt.get_vocab_size())
 
         # Initialize variables
-        self.model = None
-        self.tokenizer_src = None
-        self.tokenizer_tgt = None
-
         self.ds_raw = None
         self.train_ds = None
         self.val_ds = None
@@ -64,7 +65,6 @@ class LITTransformer(pl.LightningModule):
         Forward pass for the model training
         :param x: Inputs
         """
-        self.model = get_model(self.config, self.tokenizer_src.get_vocab_size(), self.tokenizer_tgt.get_vocab_size())
         return self.model(x)
 
     # ##################################################################################################
@@ -213,13 +213,13 @@ class LITTransformer(pl.LightningModule):
         # It only has the train split, so we divide it ourselves
         self.ds_raw = load_dataset('opus_books', f"{self.config['lang_src']}-{self.config['lang_tgt']}", split='train')
 
-    def setup(self):
+    def setup(self, stage=None):
         """
         Method to create Split the dataset into train, test and val
         """
-        # Build tokenizers
-        tokenizer_src = get_or_build_tokenizer(self.config, self.ds_raw, self.config['lang_src'])
-        tokenizer_tgt = get_or_build_tokenizer(self.config, self.ds_raw, self.config['lang_tgt'])
+        # Get tokenizers
+        tokenizer_src = self.tokenizer_src
+        tokenizer_tgt = self.tokenizer_tgt
 
         # Keep 90% for training, 10% for validation
         train_ds_size = int(0.9 * len(self.ds_raw))
@@ -243,9 +243,6 @@ class LITTransformer(pl.LightningModule):
 
         print(f'Max length of source sentence: {max_len_src}')
         print(f'Max length of target sentence: {max_len_tgt}')
-
-        self.tokenizer_src = tokenizer_src
-        self.tokenizer_tgt = tokenizer_tgt
 
     def train_dataloader(self):
         """
