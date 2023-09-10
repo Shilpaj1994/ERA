@@ -19,3 +19,9 @@ Session13/Exp3.ipynb
 Session13/loss_1_1.py
 Session13/model_39.zip
 
+Session14_15/lightning_logs/
+Session14_15/transformer.pth
+Session14_15/epoch=9-step=48500.ckpt
+Session14_15/tokenizer_en.json
+Session14_15/tokenizer_it.json
+
