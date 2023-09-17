@@ -76,8 +76,14 @@
 
 
 
-## Session-14 [Lightning Transformer]
+## Session-14_15 [Lightning Transformer]
 
 - Trained a transformer model from scratch to translate English to Italian
 - Coded the model in PyTorch Lightning
 - Trained for 10 epochs to validate if the model is learning the language
+
+
+
+## Session-17 [LLMs]
+- Trained BERT, GPT and ViT models
+- Code for all 3 model architecture, dataset and training notebooks are included in the repo
