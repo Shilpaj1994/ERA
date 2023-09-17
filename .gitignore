@@ -25,3 +25,5 @@ Session14_15/epoch=9-step=48500.ckpt
 Session14_15/tokenizer_en.json
 Session14_15/tokenizer_it.json
 
+Session17/models
+Session17/reference_notebooks
