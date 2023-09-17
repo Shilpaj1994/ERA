@@ -6,6 +6,8 @@
 - BERT and ViT are both encoder only models
 - GPT is decoder only model
 
+
+
 ## Transformer Architecture
 
 ![eAKQu.png](data/eAKQu.png)
@@ -28,12 +30,22 @@
 - In this repo, these building blocks are used to create 3 different models - BERT, GPT and ViT
 - These models are trained for specific tasks are details are mentioned below
 
+
+
 ---
+
+
 
 ![transformers.png](./data/transformers.png)
 
 
+
 ## BERT
+
+<a target="_blank" href="https://colab.research.google.com/github/Shilpaj1994/ERA/blob/master/Session17/BERT.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
+
 - Model is trained on poems of William Shakespeare
 - The task of the model is to fill the blanks given a sentence from the dataset
 - On training, the model understands the language and tries to pur appropriate word to complete the sentence
@@ -61,7 +73,14 @@ it: 9980  | loss 4.84  | Δw: 8.427
 it: 9990  | loss 5.09  | Δw: 8.434
 ```
 
+
+
 ## GPT
+
+<a target="_blank" href="https://colab.research.google.com/github/Shilpaj1994/ERA/blob/master/Session17/GPT.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
+
 - Model is trained on dataset which contains raw information of sessions
 - Model is trained to generate output given some prompt
 - On training, the model understands the language and tries to create sentences
@@ -71,7 +90,14 @@ step          0 | train loss 10.7165 | val loss 10.7144
 step        499 | train loss 0.5163 | val loss 8.0840
 ```
 
+
+
 ## ViT
+
+<a target="_blank" href="https://colab.research.google.com/github/Shilpaj1994/ERA/blob/master/Session17/ViT.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
+
 ![vit.png](./data/vit.png)
 - It is an implementation of transformer architecture for the vision problems
 - Similar to the paper, model is trained for the classification task
