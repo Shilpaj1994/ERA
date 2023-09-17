@@ -8,7 +8,7 @@
 
 ## Transformer Architecture
 
-![eAKQu.png](data%2FeAKQu.png)
+![eAKQu.png](data/eAKQu.png)
 
 - Transformer architecture are useful for both Natural Language Processing (NLP) and Computer Vision (CV) problems
 - In the NLP domain, they overcome the LSTM's and RNN's limitation having small context and memory
