@@ -8,72 +8,57 @@ Date: Sep 18, 2023
 import os
 
 # Third-Party Imports
-import numpy as np
-from PIL import Image
-from torch.utils.data import Dataset
+import torch
+from torchvision import datasets
 
 
-class UNetDataset(Dataset):
-    def __init__(self, img_dir_path, mask_dir_path, transforms):
-        """
-        Constructor
-        """
-        self.transforms = transforms
-
-        self.img_dir_path = img_dir_path
-        self.mask_dir_path = img_dir_path
-
-        self.images_path, self.mask_path = self.get_image_mask_address()
-
-    def get_image_mask_address(self):
-        """
-        Method to get the paths of all the images and masks for UNet training
-        """
-        # Read the images folder like a list
-        image_dataset = os.listdir(self.img_dir_path)
-        mask_dataset = os.listdir(self.mask_dir_path)
-
-        # Make a list for images and masks filenames
-        orig_img = []
-        mask_img = []
-        for file in image_dataset:
-            orig_img.append(file)
-        for file in mask_dataset:
-            mask_img.append(file)
-
-        # Sort the lists to get both of them in same order (the dataset has exactly the same name for images and corresponding masks)
-        orig_img.sort()
-        mask_img.sort()
-
-        return orig_img, mask_img
+class OxfordIIITPetsAugmented(datasets.OxfordIIITPet):
+    """
+    Create a dataset wrapper that allows us to perform custom image augmentations on both the target and label (segmentation mask) images.
+    """
+    def __init__(
+            self,
+            root: str,
+            split: str,
+            target_types="segmentation",
+            download=False,
+            pre_transform=None,
+            post_transform=None,
+            pre_target_transform=None,
+            post_target_transform=None,
+            common_transform=None,
+    ):
+        super().__init__(
+            root=root,
+            split=split,
+            target_types=target_types,
+            download=download,
+            transform=pre_transform,
+            target_transform=pre_target_transform,
+        )
+        self.post_transform = post_transform
+        self.post_target_transform = post_target_transform
+        self.common_transform = common_transform
 
     def __len__(self):
-        return len(self.images_path)
+        return super().__len__()
 
-    def __getitem__(self, index):
+    def __getitem__(self, idx):
         """
-        Returns Image and it's corresponding mask
+        Common transforms are performed on both the input and the labels
+        by creating a 4 channel image and running the transform on both.
+        Then the segmentation mask (4th channel) is separated out.
         """
-        # Load the image and mask
-        path = os.path.join(self.img_dir_path, self.images_path[index])
-        sample_img = Image.open(path).convert('RGB')
+        _input, target = super().__getitem__(idx)
 
-        path = os.path.join(self.mask_dir_path, self.mask_path[index])
-        sample_mask = UNetDataset.preprocess_mask(Image.open(path))
+        if self.common_transform is not None:
+            both = torch.cat([_input, target], dim=0)
+            both = self.common_transform(both)
+            (_input, target) = torch.split(both, 3, dim=0)
 
-        # Transform the raw data
-        processed_img = self.train_transform(sample_img)
-        processed_mask = self.test_transform(sample_mask)
-        processed_mask -= 1
+        if self.post_transform is not None:
+            _input = self.post_transform(_input)
+        if self.post_target_transform is not None:
+            target = self.post_target_transform(target)
 
-        return processed_img, processed_mask
-
-    @staticmethod
-    def preprocess_mask(mask):
-        """
-        Extract the mask from the trimap image
-        """
-        mask = mask.astype(np.float32)
-        mask[mask == 2.0] = 0.0
-        mask[(mask == 1.0) | (mask == 3.0)] = 1.0
-        return mask
+        return _input, target
