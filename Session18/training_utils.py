@@ -39,8 +39,6 @@ def train(model, device, train_loader, optimizer, criterion, scheduler=None):
 
     # Variables to track loss and accuracy during training
     train_loss = 0
-    correct = 0
-    processed = 0
 
     # Iterate over each batch and fetch images and labels from the batch
     for batch_idx, (data, target) in enumerate(pbar):
@@ -55,7 +53,7 @@ def train(model, device, train_loader, optimizer, criterion, scheduler=None):
         pred = model(data)
 
         # Calculate loss
-        loss = criterion(pred, target)
+        loss = criterion(pred, target.squeeze(1))
         train_loss += loss.item()
 
         # Backpropagation
@@ -66,15 +64,11 @@ def train(model, device, train_loader, optimizer, criterion, scheduler=None):
         if scheduler:
             scheduler.step()
 
-        # Get total number of correct predictions
-        correct += get_correct_predictions(pred, target)
-        processed += len(data)
-
         # Display the training information
         pbar.set_description(
-            desc=f'Train: Loss={loss.item():0.4f} Batch_id={batch_idx} Accuracy={100 * correct / processed:0.2f}')
+            desc=f'Train: Loss={loss.item():0.4f} Batch_id={batch_idx}')
 
-    return correct, processed, train_loss
+    return train_loss
 
 
 def test(model, device, test_loader, criterion):
@@ -90,7 +84,6 @@ def test(model, device, test_loader, criterion):
 
     # Variables to track loss and accuracy
     test_loss = 0
-    correct = 0
 
     # Disable gradient updation
     with torch.no_grad():
@@ -102,16 +95,11 @@ def test(model, device, test_loader, criterion):
 
             # Pass the images to the output and get the model predictions
             output = model(data)
-            test_loss += criterion(output, target, reduction='sum').item()  # sum up batch loss
-
-            # Sum up batch correct predictions
-            correct += get_correct_predictions(output, target)
+            test_loss += criterion(output, target.squeeze(1)).item()  # sum up batch loss
 
     # Calculate test loss for a epoch
-    test_loss /= len(test_loader.dataset)
+    test_loss /= len(test_loader)
 
-    print('Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)\n'.format(
-        test_loss, correct, len(test_loader.dataset),
-        100. * correct / len(test_loader.dataset)))
+    print('Test set: Average loss: {:.4f}'.format(test_loss))
 
-    return correct, test_loss
+    return test_loss
