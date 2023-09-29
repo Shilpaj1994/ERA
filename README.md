@@ -87,3 +87,10 @@
 ## Session-17 [LLMs]
 - Trained BERT, GPT and ViT models
 - Code for all 3 model architecture, dataset and training notebooks are included in the repo
+
+
+## Session-18 [UNet and Variational AutoEncoders]
+- Trained UNet mask of pets from OxfordPets dataset
+- Trained Variational AutoEncoder on MNIST to regenerate the data
+- Trained Variational AutoEncoder on CIFAR10 to regenerate the data
+- In both the VAE models, label data is also passed to the model along with the images
