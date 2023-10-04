@@ -243,9 +243,9 @@ class LITTransformer(pl.LightningModule):
 
         # Sort the train_ds by the length of the sentences in it
         sorted_train_ds = sorted(train_ds_raw, key=lambda x: len(x["translation"][self.config['long_src']]))
-        filtered_sorted_train_ds = [k for k in sorted_train_ds if len(k["translation"][self.config['lang_src']]) < 120]
-        filtered_sorted_train_ds = [k for k in filtered_sorted_train_ds if len(k["translation"][self.config['lang_tgt']]) < 120]
-        filtered_sorted_train_ds = [k for k in filtered_sorted_train_ds if len(k["translation"][self.config['lang_tgt']]) + 10 > len(k["translation"][self.config['lang_tgt']])]
+        filtered_sorted_train_ds = [k for k in sorted_train_ds if len(k["translation"][self.config['lang_src']]) < 150]
+        filtered_sorted_train_ds = [k for k in filtered_sorted_train_ds if len(k["translation"][self.config['lang_tgt']]) < 150]
+        filtered_sorted_train_ds = [k for k in filtered_sorted_train_ds if len(k["translation"][self.config['lang_src']]) + 10 > len(k["translation"][self.config['lang_tgt']])]
 
         self.train_ds = BilingualDataset(filtered_sorted_train_ds, tokenizer_src, tokenizer_tgt,
                                          self.config['lang_src'], self.config['lang_tgt'], self.config['seq_len'])
