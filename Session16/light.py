@@ -275,4 +275,5 @@ class LITTransformer(pl.LightningModule):
         """
         Method to return the DataLoader for the Validation set
         """
-        return DataLoader(self.val_ds, batch_size=1, shuffle=True)
+        return DataLoader(self.val_ds, batch_size=1, shuffle=True, collate_fn=lambda batch: collate_batch(batch))
+
