@@ -227,7 +227,7 @@ class MultiHeadAttentionBlock(nn.Module):
         # Mask attention scores
         if mask is not None:
             # Write a very small value (indicating -inf) to the positions where mask == 0
-            attention_scores.masked_fill_(mask == 0, -1e9)
+            attention_scores.masked_fill_(mask == 0, -1e4)
 
         # Apply Softmax
         attention_scores = attention_scores.softmax(dim=-1)  # (batch, h, seq_len, seq_len)
