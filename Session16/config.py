@@ -14,7 +14,7 @@ def get_config() -> dict:
     """
     return {
         'batch_size': 2048,                       # Number of sentences
-        'num_epochs': 10,
+        'num_epochs': 20,
         'lr': 10**-4,
         'seq_len': 520,                           # Maximum number of words in data sample
         'd_model': 512,                           # Dimension of embeddings i.e. an array of 512 values in which some represent score for living, non-living, finance, nature, etc.
