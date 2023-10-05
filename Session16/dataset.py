@@ -115,7 +115,7 @@ def casual_mask(size: int) -> bool:
     return mask == 0
 
 
-def collate_fn(batch):
+def collate_batch(batch):
     """
     Function to implement Dynamic Padding
     """

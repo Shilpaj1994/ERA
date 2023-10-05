@@ -19,7 +19,7 @@ from datasets import load_dataset
 from torch.utils.data import Dataset, DataLoader, random_split
 
 # Local Imports
-from dataset import BilingualDataset
+from dataset import BilingualDataset, collate_batch
 from train import get_model, get_or_build_tokenizer, greedy_decode
 
 logger = logging.getLogger("Transformer")
@@ -242,7 +242,7 @@ class LITTransformer(pl.LightningModule):
         train_ds_raw, val_ds_raw = random_split(self.ds_raw, [train_ds_size, val_ds_size])
 
         # Sort the train_ds by the length of the sentences in it
-        sorted_train_ds = sorted(train_ds_raw, key=lambda x: len(x["translation"][self.config['long_src']]))
+        sorted_train_ds = sorted(train_ds_raw, key=lambda x: len(x["translation"][self.config['lang_src']]))
         filtered_sorted_train_ds = [k for k in sorted_train_ds if len(k["translation"][self.config['lang_src']]) < 150]
         filtered_sorted_train_ds = [k for k in filtered_sorted_train_ds if len(k["translation"][self.config['lang_tgt']]) < 150]
         filtered_sorted_train_ds = [k for k in filtered_sorted_train_ds if len(k["translation"][self.config['lang_src']]) + 10 > len(k["translation"][self.config['lang_tgt']])]
@@ -269,7 +269,7 @@ class LITTransformer(pl.LightningModule):
         """
         Method to return the DataLoader for Training set
         """
-        return DataLoader(self.train_ds, batch_size=self.config['batch_size'], shuffle=True)
+        return DataLoader(self.train_ds, batch_size=self.config['batch_size'], shuffle=True, collate_fn=lambda batch: collate_batch(batch))
 
     def val_dataloader(self):
         """
