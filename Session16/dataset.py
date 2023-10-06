@@ -110,7 +110,7 @@ def casual_mask(size: int) -> bool:
     return mask == 0
 
 
-def collate_batch(batch):
+def collate_batch(batch, train_set):
     """
     Function to implement Dynamic Padding
     """
@@ -128,6 +128,10 @@ def collate_batch(batch):
     max_decoder_batch_len = max(x['decoder_token_len'] for x in batch)
 
     for b in batch:
+        # Filter data
+        if train_set and (len(b['encoder_input']) <= 1 or len(b['encoder_input']) >= 150 or len(b['decoder_input']) >= len(b['encoder_input']) + 10):
+            continue
+
         # Dynamic Padding
         enc_num_padding_tokens = max_encoder_batch_len - len(b['encoder_input'])
         dec_num_padding_tokens = max_decoder_batch_len - len(b['decoder_input'])

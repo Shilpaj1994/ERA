@@ -207,12 +207,12 @@ class LITTransformer(pl.LightningModule):
         val_ds_size = len(self.ds_raw) - train_ds_size
         train_ds_raw, val_ds_raw = random_split(self.ds_raw, [train_ds_size, val_ds_size])
 
-        # Sort the train_ds by the length of the sentences in it
-        sorted_train_ds = sorted(train_ds_raw, key=lambda x: len(x["translation"][self.config['lang_src']]))
-        filtered_sorted_train_ds = [k for k in sorted_train_ds if 150 > len(k["translation"][self.config['lang_src']]) > 1]
-        filtered_sorted_train_ds = [k for k in filtered_sorted_train_ds if len(k["translation"][self.config['lang_src']]) + 10 > len(k["translation"][self.config['lang_tgt']])]
+        # # Sort the train_ds by the length of the sentences in it
+        # sorted_train_ds = sorted(train_ds_raw, key=lambda x: len(x["translation"][self.config['lang_src']]))
+        # filtered_sorted_train_ds = [k for k in sorted_train_ds if 150 > len(k["translation"][self.config['lang_src']]) > 1]
+        # filtered_sorted_train_ds = [k for k in filtered_sorted_train_ds if len(k["translation"][self.config['lang_src']]) + 10 > len(k["translation"][self.config['lang_tgt']])]
 
-        self.train_ds = BilingualDataset(filtered_sorted_train_ds, tokenizer_src, tokenizer_tgt,
+        self.train_ds = BilingualDataset(train_ds_raw, tokenizer_src, tokenizer_tgt,
                                          self.config['lang_src'], self.config['lang_tgt'], self.config['seq_len'])
         self.val_ds = BilingualDataset(val_ds_raw, tokenizer_src, tokenizer_tgt,
                                        self.config['lang_src'], self.config['lang_tgt'], self.config['seq_len'])
@@ -234,13 +234,13 @@ class LITTransformer(pl.LightningModule):
         """
         Method to return the DataLoader for Training set
         """
-        return DataLoader(self.train_ds, batch_size=self.config['batch_size'], shuffle=True, collate_fn=lambda batch: collate_batch(batch))
+        return DataLoader(self.train_ds, batch_size=self.config['batch_size'], shuffle=True, collate_fn=lambda batch: collate_batch(batch, train_set=True))
 
     def val_dataloader(self):
         """
         Method to return the DataLoader for the Validation set
         """
-        return DataLoader(self.val_ds, batch_size=1, shuffle=True, collate_fn=lambda batch: collate_batch(batch))
+        return DataLoader(self.val_ds, batch_size=1, shuffle=True, collate_fn=lambda batch: collate_batch(batch, train_set=False))
 
     # ##############################################################################################
     # ##################################### Data Logging Hooks #####################################
