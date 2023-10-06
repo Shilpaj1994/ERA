@@ -142,15 +142,6 @@ class LITTransformer(pl.LightningModule):
         self.train_loss.append(loss)
         return loss
 
-    def on_train_epoch_end(self):
-        """
-        Method called after every training epoch
-        """
-        self.log('loss', torch.stack(self.train_loss).mean(), on_epoch=True, logger=True)
-        print(f"Loss Mean - {torch.stack(self.train_loss).mean()}")
-        self.train_loss.clear()
-        garbage_collection_cuda()
-
     def evaluate(self, batch, stage=None):
         """
         Common logic for validation and test
@@ -183,31 +174,6 @@ class LITTransformer(pl.LightningModule):
         :param batch_idx: Index of the batch
         """
         self.evaluate(batch, "val")
-
-    def on_validation_epoch_end(self):
-        """
-        Method to be called at the end of the validation epoch
-        """
-        # Compute the char error rate
-        metric = torchmetrics.CharErrorRate()
-        cer = metric(self.predicted, self.expected)
-        self.log('validation cer', cer, prog_bar=True, on_epoch=True, logger=True)
-
-        # Compute the word error rate
-        metric = torchmetrics.WordErrorRate()
-        wer = metric(self.predicted, self.expected)
-        self.log('validation wer', wer, prog_bar=True, on_epoch=True, logger=True)
-
-        # Compute the BLEU metric
-        metric = torchmetrics.BLEUScore()
-        bleu = metric(self.predicted, self.expected)
-        self.log('validation BLEU', bleu, prog_bar=True, on_epoch=True, logger=True)
-
-        # Clear the data
-        self.source_texts = []
-        self.expected = []
-        self.predicted = []
-        garbage_collection_cuda()
 
     def test_step(self, batch, batch_idx):
         """
@@ -243,8 +209,7 @@ class LITTransformer(pl.LightningModule):
 
         # Sort the train_ds by the length of the sentences in it
         sorted_train_ds = sorted(train_ds_raw, key=lambda x: len(x["translation"][self.config['lang_src']]))
-        filtered_sorted_train_ds = [k for k in sorted_train_ds if len(k["translation"][self.config['lang_src']]) < 150]
-        filtered_sorted_train_ds = [k for k in filtered_sorted_train_ds if len(k["translation"][self.config['lang_tgt']]) < 150]
+        filtered_sorted_train_ds = [k for k in sorted_train_ds if 150 > len(k["translation"][self.config['lang_src']]) > 1]
         filtered_sorted_train_ds = [k for k in filtered_sorted_train_ds if len(k["translation"][self.config['lang_src']]) + 10 > len(k["translation"][self.config['lang_tgt']])]
 
         self.train_ds = BilingualDataset(filtered_sorted_train_ds, tokenizer_src, tokenizer_tgt,
@@ -277,3 +242,42 @@ class LITTransformer(pl.LightningModule):
         """
         return DataLoader(self.val_ds, batch_size=1, shuffle=True, collate_fn=lambda batch: collate_batch(batch))
 
+    # ##############################################################################################
+    # ##################################### Data Logging Hooks #####################################
+    # ##############################################################################################
+
+    def on_train_epoch_end(self):
+        """
+        Log the data at the end of training step
+        """
+        mean_loss = torch.stack(self.train_loss).mean()
+        self.log('loss', mean_loss, on_epoch=True, logger=True)
+        print(f"Epoch: {self.current_epoch}     Mean Loss: {mean_loss}")
+        print(" ")
+        self.train_loss.clear()
+        garbage_collection_cuda()
+
+    def on_validation_epoch_end(self):
+        """
+        Method to be called at the end of the validation epoch
+        """
+        # Compute the char error rate
+        metric = torchmetrics.CharErrorRate()
+        cer = metric(self.predicted, self.expected)
+        self.log('validation cer', cer, prog_bar=True, on_epoch=True, logger=True)
+
+        # Compute the word error rate
+        metric = torchmetrics.WordErrorRate()
+        wer = metric(self.predicted, self.expected)
+        self.log('validation wer', wer, prog_bar=True, on_epoch=True, logger=True)
+
+        # Compute the BLEU metric
+        metric = torchmetrics.BLEUScore()
+        bleu = metric(self.predicted, self.expected)
+        self.log('validation BLEU', bleu, prog_bar=True, on_epoch=True, logger=True)
+
+        # Clear the data
+        self.source_texts = []
+        self.expected = []
+        self.predicted = []
+        garbage_collection_cuda()
