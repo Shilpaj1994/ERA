@@ -7,6 +7,8 @@ from utils.tools import format_results, box_prompt, point_prompt, text_prompt
 
 
 def segment_everything(
+        model,
+        device,
         input,
         input_size=1024,
         iou_threshold=0.7,
@@ -18,8 +20,6 @@ def segment_everything(
         wider=False,
         mask_random_color=True,
 ):
-    global model, device
-
     input_size = int(input_size)
     w, h = input.size
     scale = input_size / max(w, h)
@@ -54,6 +54,8 @@ def segment_everything(
 
 
 def segment_with_points(
+        model,
+        device,
         input,
         input_size=1024,
         iou_threshold=0.7,
@@ -65,7 +67,6 @@ def segment_with_points(
 ):
     global global_points
     global global_point_label
-    global model, device
 
     input_size = int(input_size)
     w, h = input.size
