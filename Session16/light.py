@@ -73,24 +73,25 @@ class LITTransformer(pl.LightningModule):
     # ##################################################################################################
     def configure_optimizers(self):
         """
-        Method to configure the optimizer
+        Method to configure optimizer and scheduler
         """
-        optimizer = optim.Adam(self.parameters(), lr=self.config['lr'], eps=1e-9)
-        scheduler = OneCycleLR(
-            optimizer,
-            max_lr=10**-3,
-            pct_start=1/10,
-            epochs=self.trainer.max_epochs,
-            steps_per_epoch=len(self.train_dataloader()),
-            div_factor=10,
-            three_phase=True,
-            final_div_factor=10,
-            anneal_strategy="linear"
-        )
-        return {
-            "optimizer": optimizer,
-            "lr_scheduler": {"scheduler": scheduler, "interval": "step"}
-        }
+        optimizer = torch.optim.Adam(self.parameters(), lr=self.config['lr'], eps=1e-9)
+        # scheduler = OneCycleLR(
+        #     optimizer,
+        #     max_lr=10 ** -3,
+        #     pct_start=1 / 10,
+        #     epochs=self.trainer.max_epochs,
+        #     steps_per_epoch=len(self.train_dataloader()),
+        #     div_factor=10,
+        #     three_phase=True,
+        #     final_div_factor=10,
+        #     anneal_strategy="linear"
+        # )
+        # return {
+        #     "optimizer": optimizer,
+        #     "lr_scheduler": {"scheduler": scheduler, "interval": "step"},
+        # }
+        return optimizer
 
     def optimizer_zero_grad(self, epoch, batch_idx, optimizer):
         """
@@ -234,13 +235,15 @@ class LITTransformer(pl.LightningModule):
         """
         Method to return the DataLoader for Training set
         """
-        return DataLoader(self.train_ds, batch_size=self.config['batch_size'], shuffle=True, collate_fn=lambda batch: collate_batch(batch, train_set=True))
+        # return DataLoader(self.train_ds, batch_size=self.config['batch_size'], shuffle=True, collate_fn=lambda batch: collate_batch(batch, train_set=True))
+        return DataLoader(self.train_ds, batch_size=self.config['batch_size'], shuffle=True)
 
     def val_dataloader(self):
         """
         Method to return the DataLoader for the Validation set
         """
-        return DataLoader(self.val_ds, batch_size=1, shuffle=True, collate_fn=lambda batch: collate_batch(batch, train_set=False))
+        # return DataLoader(self.val_ds, batch_size=1, shuffle=True, collate_fn=lambda batch: collate_batch(batch, train_set=False))
+        return DataLoader(self.val_ds, batch_size=1, shuffle=True)
 
     # ##############################################################################################
     # ##################################### Data Logging Hooks #####################################
