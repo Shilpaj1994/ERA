@@ -14,12 +14,11 @@ import torch.nn as nn
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.memory import garbage_collection_cuda
 import torch.optim as optim
-from torch.optim.lr_scheduler import OneCycleLR
 from datasets import load_dataset
 from torch.utils.data import Dataset, DataLoader, random_split
 
 # Local Imports
-from dataset import BilingualDataset, collate_batch
+from dataset import BilingualDataset
 from train import get_model, get_or_build_tokenizer, greedy_decode
 
 logger = logging.getLogger("Transformer")
@@ -73,24 +72,9 @@ class LITTransformer(pl.LightningModule):
     # ##################################################################################################
     def configure_optimizers(self):
         """
-        Method to configure optimizer and scheduler
+        Method to configure the optimizer
         """
-        optimizer = torch.optim.Adam(self.parameters(), lr=self.config['lr'], eps=1e-9)
-        # scheduler = OneCycleLR(
-        #     optimizer,
-        #     max_lr=10 ** -3,
-        #     pct_start=1 / 10,
-        #     epochs=self.trainer.max_epochs,
-        #     steps_per_epoch=len(self.train_dataloader()),
-        #     div_factor=10,
-        #     three_phase=True,
-        #     final_div_factor=10,
-        #     anneal_strategy="linear"
-        # )
-        # return {
-        #     "optimizer": optimizer,
-        #     "lr_scheduler": {"scheduler": scheduler, "interval": "step"},
-        # }
+        optimizer = optim.Adam(self.parameters(), lr=self.config['lr'], eps=1e-9)
         return optimizer
 
     def optimizer_zero_grad(self, epoch, batch_idx, optimizer):
@@ -143,6 +127,15 @@ class LITTransformer(pl.LightningModule):
         self.train_loss.append(loss)
         return loss
 
+    def on_train_epoch_end(self):
+        """
+        Method called after every training epoch
+        """
+        self.log('loss', torch.stack(self.train_loss).mean(), on_epoch=True, logger=True)
+        print(f"Loss Mean - {torch.stack(self.train_loss).mean()}")
+        self.train_loss.clear()
+        garbage_collection_cuda()
+
     def evaluate(self, batch, stage=None):
         """
         Common logic for validation and test
@@ -176,6 +169,31 @@ class LITTransformer(pl.LightningModule):
         """
         self.evaluate(batch, "val")
 
+    def on_validation_epoch_end(self):
+        """
+        Method to be called at the end of the validation epoch
+        """
+        # Compute the char error rate
+        metric = torchmetrics.CharErrorRate()
+        cer = metric(self.predicted, self.expected)
+        self.log('validation cer', cer, prog_bar=True, on_epoch=True, logger=True)
+
+        # Compute the word error rate
+        metric = torchmetrics.WordErrorRate()
+        wer = metric(self.predicted, self.expected)
+        self.log('validation wer', wer, prog_bar=True, on_epoch=True, logger=True)
+
+        # Compute the BLEU metric
+        metric = torchmetrics.BLEUScore()
+        bleu = metric(self.predicted, self.expected)
+        self.log('validation BLEU', bleu, prog_bar=True, on_epoch=True, logger=True)
+
+        # Clear the data
+        self.source_texts = []
+        self.expected = []
+        self.predicted = []
+        garbage_collection_cuda()
+
     def test_step(self, batch, batch_idx):
         """
         Method called on test dataset to check model performance on unseen data
@@ -208,11 +226,6 @@ class LITTransformer(pl.LightningModule):
         val_ds_size = len(self.ds_raw) - train_ds_size
         train_ds_raw, val_ds_raw = random_split(self.ds_raw, [train_ds_size, val_ds_size])
 
-        # # Sort the train_ds by the length of the sentences in it
-        # sorted_train_ds = sorted(train_ds_raw, key=lambda x: len(x["translation"][self.config['lang_src']]))
-        # filtered_sorted_train_ds = [k for k in sorted_train_ds if 150 > len(k["translation"][self.config['lang_src']]) > 1]
-        # filtered_sorted_train_ds = [k for k in filtered_sorted_train_ds if len(k["translation"][self.config['lang_src']]) + 10 > len(k["translation"][self.config['lang_tgt']])]
-
         self.train_ds = BilingualDataset(train_ds_raw, tokenizer_src, tokenizer_tgt,
                                          self.config['lang_src'], self.config['lang_tgt'], self.config['seq_len'])
         self.val_ds = BilingualDataset(val_ds_raw, tokenizer_src, tokenizer_tgt,
@@ -235,52 +248,10 @@ class LITTransformer(pl.LightningModule):
         """
         Method to return the DataLoader for Training set
         """
-        # return DataLoader(self.train_ds, batch_size=self.config['batch_size'], shuffle=True, collate_fn=lambda batch: collate_batch(batch, train_set=True))
         return DataLoader(self.train_ds, batch_size=self.config['batch_size'], shuffle=True)
 
     def val_dataloader(self):
         """
         Method to return the DataLoader for the Validation set
         """
-        # return DataLoader(self.val_ds, batch_size=1, shuffle=True, collate_fn=lambda batch: collate_batch(batch, train_set=False))
         return DataLoader(self.val_ds, batch_size=1, shuffle=True)
-
-    # ##############################################################################################
-    # ##################################### Data Logging Hooks #####################################
-    # ##############################################################################################
-
-    def on_train_epoch_end(self):
-        """
-        Log the data at the end of training step
-        """
-        mean_loss = torch.stack(self.train_loss).mean()
-        self.log('loss', mean_loss, on_epoch=True, logger=True)
-        print(f"Epoch: {self.current_epoch}     Mean Loss: {mean_loss}")
-        print(" ")
-        self.train_loss.clear()
-        garbage_collection_cuda()
-
-    def on_validation_epoch_end(self):
-        """
-        Method to be called at the end of the validation epoch
-        """
-        # Compute the char error rate
-        metric = torchmetrics.CharErrorRate()
-        cer = metric(self.predicted, self.expected)
-        self.log('validation cer', cer, prog_bar=True, on_epoch=True, logger=True)
-
-        # Compute the word error rate
-        metric = torchmetrics.WordErrorRate()
-        wer = metric(self.predicted, self.expected)
-        self.log('validation wer', wer, prog_bar=True, on_epoch=True, logger=True)
-
-        # Compute the BLEU metric
-        metric = torchmetrics.BLEUScore()
-        bleu = metric(self.predicted, self.expected)
-        self.log('validation BLEU', bleu, prog_bar=True, on_epoch=True, logger=True)
-
-        # Clear the data
-        self.source_texts = []
-        self.expected = []
-        self.predicted = []
-        garbage_collection_cuda()

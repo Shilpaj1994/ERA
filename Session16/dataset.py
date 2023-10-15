@@ -61,8 +61,8 @@ class BilingualDataset(Dataset):
         dec_input_tokens = self.tokenizer_tgt.encode(tgt_text).ids
 
         # Calculate number of words to be padded for encoder and decoder sample
-        enc_num_padding_tokens = self.seq_len - len(enc_input_tokens) - 2  # Encoder is provided with sos and eos token
-        dec_num_padding_tokens = self.seq_len - len(dec_input_tokens) - 1  # Decoder is only provided with sos token
+        enc_num_padding_tokens = self.seq_len - len(enc_input_tokens) - 2   # Encoder is provided with sos and eos token
+        dec_num_padding_tokens = self.seq_len - len(dec_input_tokens) - 1   # Decoder is only provided with sos token
 
         # Make sure the number of padding token is not negative. If it is, the sentence is too long
         if enc_num_padding_tokens < 0 or dec_num_padding_tokens < 0:
@@ -106,12 +106,11 @@ class BilingualDataset(Dataset):
         assert label.size(0) == self.seq_len
 
         return {
-            "encoder_input": encoder_input,  # (seq_len)
-            "decoder_input": decoder_input,  # (seq_len)
-            "encoder_mask": (encoder_input != self.pad_token).unsqueeze(0).unsqueeze(0).int(),  # (1, 1, seq_len)
-            "decoder_mask": (decoder_input != self.pad_token).unsqueeze(0).int() & casual_mask(decoder_input.size(0)),
-            # (1, seq_len) & (1, seq_len, seq_len)
-            "label": label,  # (seq_len)
+            "encoder_input": encoder_input,                                                                             # (seq_len)
+            "decoder_input": decoder_input,                                                                             # (seq_len)
+            "encoder_mask": (encoder_input != self.pad_token).unsqueeze(0).unsqueeze(0).int(),                          # (1, 1, seq_len)
+            "decoder_mask": (decoder_input != self.pad_token).unsqueeze(0).int() & casual_mask(decoder_input.size(0)),  # (1, seq_len) & (1, seq_len, seq_len)
+            "label": label,                                                                                             # (seq_len)
             "src_text": src_text,
             "tgt_text": tgt_text
         }
@@ -124,84 +123,3 @@ def casual_mask(size: int) -> bool:
     """
     mask = torch.triu(torch.ones((1, size, size)), diagonal=1).type(torch.int)
     return mask == 0
-
-
-def collate_batch(batch, train_set):
-    """
-    Function to implement Dynamic Padding
-    """
-    # Lists to store data
-    encoder_input_list = []
-    decoder_input_list = []
-    decoder_mask_list = []
-    encoder_mask_list = []
-    label_list = []
-    src_text_list = []
-    target_text_list = []
-
-    # Max len in a batch
-    max_encoder_batch_len = max(x['encoder_token_len'] for x in batch)
-    max_decoder_batch_len = max(x['decoder_token_len'] for x in batch)
-
-    for b in batch:
-        # Filter data
-        if train_set and (len(b['encoder_input']) <= 1 or len(b['encoder_input']) >= 150 or len(b['decoder_input']) >= len(b['encoder_input']) + 10):
-            continue
-
-        # Dynamic Padding
-        enc_num_padding_tokens = max_encoder_batch_len - len(b['encoder_input'])
-        dec_num_padding_tokens = max_decoder_batch_len - len(b['decoder_input'])
-
-        # Make sure the number of padding token is not negative. If it is, the sentence is too long
-        if enc_num_padding_tokens < 0 or dec_num_padding_tokens < 0:
-            raise ValueError("Sentence too long")
-
-        # Add sos and eos token for encoder input
-        encoder_input = torch.cat(
-            [
-                b['encoder_input'],
-                torch.tensor([b['pad_token']] * enc_num_padding_tokens, dtype=torch.int64)
-            ],
-            dim=0
-        )
-
-        # Add only sos to decoder input
-        decoder_input = torch.cat(
-            [
-                b['decoder_input'],
-                torch.tensor([b['pad_token']] * dec_num_padding_tokens, dtype=torch.int64)
-            ],
-            dim=0
-        )
-
-        # Add only eos token to label. Label allows us to run our decoder into parallel steps
-        # This is ground truth for the decoder i.e. decoder will try to generate this
-        label = torch.cat(
-            [
-                b['label'],
-                torch.tensor([b['pad_token']] * dec_num_padding_tokens, dtype=torch.int64)
-            ],
-            dim=0
-        )
-
-        encoder_mask = (encoder_input != b['pad_token']).unsqueeze(0).unsqueeze(0).unsqueeze(0).int()  # 1,1,seq_len
-        decoder_mask = ((decoder_input != b['pad_token']).unsqueeze(0).int() & casual_mask(decoder_input.size(0))).unsqueeze(0)
-
-        # Append all data
-        encoder_input_list.append(encoder_input)
-        decoder_input_list.append(decoder_input)
-        decoder_mask_list.append(decoder_mask)
-        encoder_mask_list.append(encoder_mask)
-        label_list.append(label)
-        src_text_list.append(b['src_text'])
-        target_text_list.append(b['tgt_text'])
-
-        return {
-            "encoder_input": torch.vstack(encoder_input_list),
-            "decoder_input": torch.vstack(decoder_input_list),
-            "encoder_mask": torch.vstack(encoder_mask_list),
-            "decoder_mask": torch.vstack(decoder_mask_list),
-            "label": torch.vstack(label_list),
-            "src_text": src_text_list,
-            "tgt_text": target_text_list
-        }

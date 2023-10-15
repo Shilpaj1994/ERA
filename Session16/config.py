@@ -14,13 +14,13 @@ def get_config() -> dict:
     """
     return {
         'batch_size': 2048,                       # Number of sentences
-        'num_epochs': 20,
+        'num_epochs': 10,
         'lr': 10**-4,
-        'seq_len': 520,                           # Maximum number of words in data sample
+        'seq_len': 350,                           # Maximum number of words in data sample
         'd_model': 512,                           # Dimension of embeddings i.e. an array of 512 values in which some represent score for living, non-living, finance, nature, etc.
                                                   # Currently, this number is around 10_000 for GPT-4
         'lang_src': "en",                         # Source language: English
-        'lang_tgt': "fr",                         # Target language: Italian
+        'lang_tgt': "it",                         # Target language: Italian
         'model_folder': "weights",                # Folder in which weights will be stored
         'model_basename': 'tmodel_',              # Prefix
         'preload': False,                         # If True, it will start from existing saved model
