@@ -14,6 +14,7 @@ import torch.nn as nn
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.memory import garbage_collection_cuda
 import torch.optim as optim
+from torch.optim.lr_scheduler import OneCycleLR
 from datasets import load_dataset
 from torch.utils.data import Dataset, DataLoader, random_split
 
@@ -72,10 +73,24 @@ class LITTransformer(pl.LightningModule):
     # ##################################################################################################
     def configure_optimizers(self):
         """
-        Method to configure the optimizer
+        Method to configure optimizer and scheduler
         """
-        optimizer = optim.Adam(self.parameters(), lr=self.config['lr'], eps=1e-9)
-        return optimizer
+        optimizer = torch.optim.Adam(self.parameters(), lr=self.config['lr'], eps=1e-9)
+        scheduler = OneCycleLR(
+            optimizer,
+            max_lr=10 ** -3,
+            pct_start=1 / 10,
+            epochs=self.trainer.max_epochs,
+            steps_per_epoch=len(self.train_dataloader()),
+            div_factor=10,
+            three_phase=True,
+            final_div_factor=10,
+            anneal_strategy="linear"
+        )
+        return {
+            "optimizer": optimizer,
+            "lr_scheduler": {"scheduler": scheduler, "interval": "step"},
+        }
 
     def optimizer_zero_grad(self, epoch, batch_idx, optimizer):
         """
