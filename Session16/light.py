@@ -19,7 +19,7 @@ from datasets import load_dataset
 from torch.utils.data import Dataset, DataLoader, random_split
 
 # Local Imports
-from dataset import BilingualDataset
+from dataset import BilingualDataset, collate_batch
 from train import get_model, get_or_build_tokenizer, greedy_decode
 
 logger = logging.getLogger("Transformer")
@@ -268,7 +268,7 @@ class LITTransformer(pl.LightningModule):
         """
         Method to return the DataLoader for Training set
         """
-        return DataLoader(self.train_ds, batch_size=self.config['batch_size'], shuffle=True)
+        return DataLoader(self.train_ds, batch_size=self.config['batch_size'], shuffle=True, collate_fn=lambda batch: collate_batch(batch))
 
     def val_dataloader(self):
         """
