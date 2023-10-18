@@ -45,9 +45,9 @@ class LITTransformer(pl.LightningModule):
         # Prepare Data and Model
         self.config = config
         self.prepare_data()
-        self.setup()
         self.tokenizer_src = get_or_build_tokenizer(self.config, self.ds_raw, self.config['lang_src'])
         self.tokenizer_tgt = get_or_build_tokenizer(self.config, self.ds_raw, self.config['lang_tgt'])
+        self.setup()
         self.model = get_model(self.config, self.tokenizer_src.get_vocab_size(), self.tokenizer_tgt.get_vocab_size())
 
         # Initialize variables
