@@ -262,8 +262,8 @@ class LITTransformer(pl.LightningModule):
             max_len_src = max(max_len_src, len(src_ids))
             max_len_tgt = max(max_len_tgt, len(tgt_ids))
 
-        print(f'Max length of source sentence: {max_len_src}')
-        print(f'Max length of target sentence: {max_len_tgt}')
+        print(f'Max length of source sentence tokens: {max_len_src}')
+        print(f'Max length of target sentence tokens: {max_len_tgt}')
 
     def train_dataloader(self):
         """
