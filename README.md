@@ -84,9 +84,15 @@
 
 
 
+## Session-16 [Training Faster Transformer]
+
+
+
 ## Session-17 [LLMs]
 - Trained BERT, GPT and ViT models
 - Code for all 3 model architecture, dataset and training notebooks are included in the repo
+
+
 
 
 ## Session-18 [UNet and Variational AutoEncoders]
@@ -94,3 +100,18 @@
 - Trained Variational AutoEncoder on MNIST to regenerate the data
 - Trained Variational AutoEncoder on CIFAR10 to regenerate the data
 - In both the VAE models, label data is also passed to the model along with the images
+
+
+
+## Session-19 [FastSAM]
+
+- Gradio App for FastSAM implementation
+
+
+
+## Session-20 [Stable Diffusion]
+
+
+## Session-21 [NanoGPT]
+- NanoGPT Transformer model [Decoder Only] is trained from the Andrej Karpathy's video
+- Gradio App is created to generate Shakespeare style text character-by-character
