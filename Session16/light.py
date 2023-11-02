@@ -34,7 +34,7 @@ class LITTransformer(pl.LightningModule):
     PyTorch Lightning Code for Transformer
     """
 
-    def __init__(self, config: dict):
+    def __init__(self, config: dict, train_loader_length: int):
         """
         Constructor
         :param config: Dictionary with training parameter configuration
@@ -47,7 +47,8 @@ class LITTransformer(pl.LightningModule):
         self.prepare_data()
         self.tokenizer_src = get_or_build_tokenizer(self.config, self.ds_raw, self.config['lang_src'])
         self.tokenizer_tgt = get_or_build_tokenizer(self.config, self.ds_raw, self.config['lang_tgt'])
-        self.setup()
+        # self.setup()
+        self.train_dataloader_length = train_loader_length
         self.model = get_model(self.config, self.tokenizer_src.get_vocab_size(), self.tokenizer_tgt.get_vocab_size())
 
         # Initialize variables
@@ -82,7 +83,7 @@ class LITTransformer(pl.LightningModule):
             max_lr=10 ** -3,
             pct_start=1 / 10,
             epochs=self.trainer.max_epochs,
-            steps_per_epoch=len(self.train_dataloader()),
+            steps_per_epoch=self.train_dataloader_length,
             div_factor=10,
             three_phase=True,
             final_div_factor=10,
@@ -221,60 +222,60 @@ class LITTransformer(pl.LightningModule):
     # ##############################################################################################
     # ##################################### Data Related Hooks #####################################
     # ##############################################################################################
-
-    def prepare_data(self):
-        """
-        Method to download the dataset
-        """
-        # It only has the train split, so we divide it ourselves
-        self.ds_raw = load_dataset('opus_books', f"{self.config['lang_src']}-{self.config['lang_tgt']}", split='train')
-
-    def setup(self, stage=None):
-        """
-        Method to create Split the dataset into train, test and val
-        """
-        # Get tokenizers
-        tokenizer_src = self.tokenizer_src
-        tokenizer_tgt = self.tokenizer_tgt
-
-        # Keep 90% for training, 10% for validation
-        train_ds_size = int(0.9 * len(self.ds_raw))
-        val_ds_size = len(self.ds_raw) - train_ds_size
-        train_ds_raw, val_ds_raw = random_split(self.ds_raw, [train_ds_size, val_ds_size])
-
-        # # Sort the train_ds by the length of the sentences in it
-        sorted_train_ds = sorted(train_ds_raw, key=lambda x: len(x["translation"][self.config['lang_src']]))
-        filtered_sorted_train_ds = [k for k in sorted_train_ds if 150 > len(k["translation"][self.config['lang_src']]) > 1]
-        filtered_sorted_train_ds = [k for k in filtered_sorted_train_ds if len(k["translation"][self.config['lang_src']]) + 10 > len(k["translation"][self.config['lang_tgt']])]
-
-        self.train_ds = BilingualDataset(filtered_sorted_train_ds, tokenizer_src, tokenizer_tgt,
-                                         self.config['lang_src'], self.config['lang_tgt'], self.config['seq_len'])
-        self.val_ds = BilingualDataset(val_ds_raw, tokenizer_src, tokenizer_tgt,
-                                       self.config['lang_src'], self.config['lang_tgt'], self.config['seq_len'])
-
-        # Find the maximum length of each sentence in the source and target sentence
-        max_len_src = 0
-        max_len_tgt = 0
-
-        for item in self.ds_raw:
-            src_ids = tokenizer_src.encode(item['translation'][self.config['lang_src']]).ids
-            tgt_ids = tokenizer_tgt.encode(item['translation'][self.config['lang_tgt']]).ids
-            max_len_src = max(max_len_src, len(src_ids))
-            max_len_tgt = max(max_len_tgt, len(tgt_ids))
-
-        print(f'Max length of source sentence tokens: {max_len_src}')
-        print(f'Max length of target sentence tokens: {max_len_tgt}')
-
-    def train_dataloader(self):
-        """
-        Method to return the DataLoader for Training set
-        """
-        return DataLoader(self.train_ds, batch_size=self.config['batch_size'], shuffle=True)
-        # return DataLoader(self.train_ds, batch_size=self.config['batch_size'], shuffle=True, collate_fn=collate_batch)
-
-    def val_dataloader(self):
-        """
-        Method to return the DataLoader for the Validation set
-        """
-        return DataLoader(self.val_ds, batch_size=1, shuffle=True)
-        # return DataLoader(self.val_ds, batch_size=1, shuffle=True, collate_fn=collate_batch)
+    #
+    # def prepare_data(self):
+    #     """
+    #     Method to download the dataset
+    #     """
+    #     # It only has the train split, so we divide it ourselves
+    #     self.ds_raw = load_dataset('opus_books', f"{self.config['lang_src']}-{self.config['lang_tgt']}", split='train')
+    #
+    # def setup(self, stage=None):
+    #     """
+    #     Method to create Split the dataset into train, test and val
+    #     """
+    #     # Get tokenizers
+    #     tokenizer_src = self.tokenizer_src
+    #     tokenizer_tgt = self.tokenizer_tgt
+    #
+    #     # Keep 90% for training, 10% for validation
+    #     train_ds_size = int(0.9 * len(self.ds_raw))
+    #     val_ds_size = len(self.ds_raw) - train_ds_size
+    #     train_ds_raw, val_ds_raw = random_split(self.ds_raw, [train_ds_size, val_ds_size])
+    #
+    #     # # Sort the train_ds by the length of the sentences in it
+    #     sorted_train_ds = sorted(train_ds_raw, key=lambda x: len(x["translation"][self.config['lang_src']]))
+    #     filtered_sorted_train_ds = [k for k in sorted_train_ds if 150 > len(k["translation"][self.config['lang_src']]) > 1]
+    #     filtered_sorted_train_ds = [k for k in filtered_sorted_train_ds if len(k["translation"][self.config['lang_src']]) + 10 > len(k["translation"][self.config['lang_tgt']])]
+    #
+    #     self.train_ds = BilingualDataset(filtered_sorted_train_ds, tokenizer_src, tokenizer_tgt,
+    #                                      self.config['lang_src'], self.config['lang_tgt'], self.config['seq_len'])
+    #     self.val_ds = BilingualDataset(val_ds_raw, tokenizer_src, tokenizer_tgt,
+    #                                    self.config['lang_src'], self.config['lang_tgt'], self.config['seq_len'])
+    #
+    #     # Find the maximum length of each sentence in the source and target sentence
+    #     max_len_src = 0
+    #     max_len_tgt = 0
+    #
+    #     for item in self.ds_raw:
+    #         src_ids = tokenizer_src.encode(item['translation'][self.config['lang_src']]).ids
+    #         tgt_ids = tokenizer_tgt.encode(item['translation'][self.config['lang_tgt']]).ids
+    #         max_len_src = max(max_len_src, len(src_ids))
+    #         max_len_tgt = max(max_len_tgt, len(tgt_ids))
+    #
+    #     print(f'Max length of source sentence tokens: {max_len_src}')
+    #     print(f'Max length of target sentence tokens: {max_len_tgt}')
+    #
+    # def train_dataloader(self):
+    #     """
+    #     Method to return the DataLoader for Training set
+    #     """
+    #     return DataLoader(self.train_ds, batch_size=self.config['batch_size'], shuffle=True)
+    #     # return DataLoader(self.train_ds, batch_size=self.config['batch_size'], shuffle=True, collate_fn=collate_batch)
+    #
+    # def val_dataloader(self):
+    #     """
+    #     Method to return the DataLoader for the Validation set
+    #     """
+    #     return DataLoader(self.val_ds, batch_size=1, shuffle=True)
+    #     # return DataLoader(self.val_ds, batch_size=1, shuffle=True, collate_fn=collate_batch)
