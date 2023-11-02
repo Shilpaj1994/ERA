@@ -207,22 +207,20 @@ def get_ds(config):
     val_ds_size = len(ds_raw) - train_ds_size
     train_ds_raw, val_ds_raw = random_split(ds_raw, [train_ds_size, val_ds_size])
 
+    # Sort the train_ds by the length of the sentences in it
+    sorted_train_ds = sorted(train_ds_raw, key=lambda x: len(x["translation"][config['lang_src']]))
+    filtered_sorted_train_ds = [k for k in sorted_train_ds if 150 > len(k["translation"][config['lang_src']]) > 1]
+    filtered_sorted_train_ds = [k for k in filtered_sorted_train_ds if len(k["translation"][config['lang_src']]) + 10 > len(k["translation"][config['lang_tgt']])]
+
     # Custom Dataset
-    train_ds = BilingualDataset(train_ds_raw, tokenizer_src, tokenizer_tgt, config['lang_src'], config['lang_tgt'], config['seq_len'])
+    train_ds = BilingualDataset(filtered_sorted_train_ds, tokenizer_src, tokenizer_tgt, config['lang_src'], config['lang_tgt'], config['seq_len'])
     val_ds = BilingualDataset(val_ds_raw, tokenizer_src, tokenizer_tgt, config['lang_src'], config['lang_tgt'], config['seq_len'])
 
     # Custom DataLoader
-    train_dataloader = DataLoader(train_ds, batch_size=config['batch_size'], shuffle=True, collate_fn=lambda batch: collate_batch(batch, train_set=True), num_workers=16)
-    val_dataloader = DataLoader(val_ds, batch_size=1, shuffle=True, collate_fn=lambda batch: collate_batch(batch, train_set=False), num_workers=16)
+    train_dataloader = DataLoader(train_ds, batch_size=config['batch_size'], shuffle=True, collate_fn=lambda batch: collate_batch(batch))
+    val_dataloader = DataLoader(val_ds, batch_size=1, shuffle=True, collate_fn=lambda batch: collate_batch(batch))
 
     return train_dataloader, val_dataloader, tokenizer_src, tokenizer_tgt
-
-    # Create DataLoader
-    train_dataloader = DataLoader(train_ds, batch_size=config['batch_size'], shuffle=True)
-    val_dataloader = DataLoader(val_ds, batch_size=1, shuffle=True)
-
-    return train_dataloader, val_dataloader, tokenizer_src, tokenizer_tgt
-
 
 def get_model(config, vocab_src_len, vocab_tgt_len):
     """
