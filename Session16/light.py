@@ -34,7 +34,7 @@ class LITTransformer(pl.LightningModule):
     PyTorch Lightning Code for Transformer
     """
 
-    def __init__(self, config: dict, train_loader_length: int):
+    def __init__(self, config: dict, train_loader_length: int, tokenizer_src, tokenizer_tgt):
         """
         Constructor
         :param config: Dictionary with training parameter configuration
@@ -45,8 +45,8 @@ class LITTransformer(pl.LightningModule):
         # Prepare Data and Model
         self.config = config
         self.prepare_data()
-        self.tokenizer_src = get_or_build_tokenizer(self.config, self.ds_raw, self.config['lang_src'])
-        self.tokenizer_tgt = get_or_build_tokenizer(self.config, self.ds_raw, self.config['lang_tgt'])
+        self.tokenizer_src = tokenizer_src
+        self.tokenizer_tgt = tokenizer_tgt
         # self.setup()
         self.train_dataloader_length = train_loader_length
         self.model = get_model(self.config, self.tokenizer_src.get_vocab_size(), self.tokenizer_tgt.get_vocab_size())
